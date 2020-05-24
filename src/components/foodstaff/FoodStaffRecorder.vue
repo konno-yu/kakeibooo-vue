@@ -1,0 +1,241 @@
+<template>
+    <div class="food_staff_recorder">
+        <div class="preserved_place_area">
+            <!-- 冷凍庫 -->
+            <div class="preserved_place_category">
+                <div class="preserved_place_label">
+                    <v-icon class="preserved_place_icon" color="#616161">mdi-fridge-top</v-icon>
+                    冷凍庫
+                </div>
+                <div class="food_staff_list" style="overflow: scroll;">
+                    <FoodStaffList :listItems="fridgeTop">
+                        <template slot-scope="{listItems, onclick}">
+                        <FoodStaffListItem
+                            v-for="(listItem, index) in fridgeTop"
+                            :key="index"
+                            :listItem="listItem"
+                            @click="onclick"
+                        />
+                        </template>
+                    </FoodStaffList>
+                </div>
+            </div>
+            <!-- 冷蔵庫 -->
+            <div class="preserved_place_category">
+                <div class="preserved_place_label">
+                    <v-icon class="preserved_place_icon" color="#616161">mdi-fridge-bottom</v-icon>
+                    冷蔵庫
+                </div>
+                <div class="food_staff_list" style="overflow: scroll;">
+                    <div class="small_category_tab">
+                        <KakeiboooTab :tabItems="tabItems" v-model="value">
+                            <template slot-scope="{ tabItems, onTabChange, value }">
+                            <KakeiboooTabItem
+                                v-for="(tabItem, index) in tabItems"
+                                :key="index"
+                                :tabItem="tabItem"
+                                :isSelected="value === tabItem.label"
+                                @change="ontabchange"
+                            />
+                            </template>
+                        </KakeiboooTab>
+                    </div>
+                    <div class="food_staff_list_with_tab">
+                        <FoodStaffList :listItems="fridgeBottom">
+                            <template slot-scope="{listItems, onclick}">
+                            <FoodStaffListItem
+                                v-for="(listItem, index) in fridgeBottom"
+                                :key="index"
+                                :listItem="listItem"
+                                @click="onclick"
+                            />
+                            </template>
+                        </FoodStaffList>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="preserved_place_area">
+                <!-- 調味料 -->
+                <div class="preserved_place_category">
+                    <div class="preserved_place_label">
+                        <v-icon class="preserved_place_icon" color="#616161">mdi-shaker-outline</v-icon>
+                        調味料
+                    </div>
+                    <div class="food_staff_list" style="overflow: scroll;">
+                        <FoodStaffList :listItems="seasoning">
+                            <template slot-scope="{listItems, onclick}">
+                            <FoodStaffListItem
+                                v-for="(listItem, index) in seasoning"
+                                :key="index"
+                                :listItem="listItem"
+                                @click="onclick"
+                            />
+                            </template>
+                        </FoodStaffList>
+                    </div>
+                </div>
+                <!-- 保存食 -->
+                <div class="preserved_place_category">
+                    <div class="preserved_place_label">
+                        <v-icon class="preserved_place_icon" color="#616161">mdi-noodles</v-icon>
+                        保存食
+                    </div>
+                    <div class="food_staff_list" style="overflow:scroll;">
+                        <FoodStaffList :listItems="preserved">
+                            <template slot-scope="{listItems, onclick}">
+                            <FoodStaffListItem
+                                v-for="(listItem, index) in preserved"
+                                :key="index"
+                                :listItem="listItem"
+                                @click="onclick"
+                            />
+                            </template>
+                        </FoodStaffList>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</template>
+
+<script lang="ts">
+import { Vue, Component, Prop } from 'vue-property-decorator';
+import FoodStaffList from '@/components/foodstaff/FoodStaffList.vue';
+import FoodStaffListItem from '@/components/foodstaff/FoodStaffListItem.vue';
+import KakeiboooTab from '@/components/common/KakeiboooTab.vue';
+import KakeiboooTabItem from '@/components/common/KakeiboooTabItem.vue';
+import { foodCountUnit } from '@/components/foodstaff/FoodStaffRegister.vue';
+
+type tabItemLabel = '野菜' | '残りもの' | 'その他';
+type foodStaffDetails = {
+    name: string;
+    count: number;
+    unit: foodCountUnit;
+    category: 'fridge-top' | 'fridge-bottom' | 'seasoning' | 'preserved';
+    subCategory?: 'vegetables' | 'leftovers'| 'others';
+}
+
+@Component({
+    components: {
+        FoodStaffList,
+        FoodStaffListItem,
+        KakeiboooTab,
+        KakeiboooTabItem
+    }
+})
+export default class FoodStaffRecorder extends Vue {
+    private value: tabItemLabel = '野菜';
+
+    private tabItems: {label: tabItemLabel, icon: string}[] = [
+        {label: '野菜', icon: 'mdi-corn'},
+        {label: '残りもの', icon: 'mdi-diamond-stone'},
+        {label: 'その他', icon: 'mdi-flower'}
+    ];
+
+    private fridgeTop: foodStaffDetails[] = [];
+    private fridgeBottom: foodStaffDetails[] = [];
+    private seasoning: foodStaffDetails[] = [];
+    private preserved: foodStaffDetails[] = [];
+
+    // TODO サンプルなのでのちのち消す → 本当はmount時にSVから取得する
+    private foodStaffSample: foodStaffDetails[] = [
+        {name: "豚こま", count: 100, unit:'g', category: 'fridge-top'},
+        {name: "鶏むね", count: 150, unit:'g', category: 'fridge-top'},
+        {name: "あいびき肉", count: 200, unit:'g', category: 'fridge-top'},
+        {name: "枝豆", count: 1, unit:'袋', category: 'fridge-top'},
+        {name: "大根", count: 0.2, unit: '本', category: 'fridge-bottom', subCategory: 'vegetables'},
+        {name: "人参", count: 0.5, unit: '本', category: 'fridge-bottom', subCategory: 'vegetables'},
+        {name: "じゃがいも", count: 3, unit: '個', category: 'fridge-bottom', subCategory: 'vegetables'},
+        {name: "白菜", count: 1, unit: '本', category: 'fridge-bottom', subCategory: 'vegetables'},
+        {name: "きゅうり", count: 2, unit: '個', category: 'fridge-bottom', subCategory: 'vegetables'},
+        {name: "肉じゃが", count: 100, unit: 'g', category: 'fridge-bottom', subCategory: 'leftovers'},
+        {name: "水菜サラダ", count: 100, unit: 'g', category: 'fridge-bottom', subCategory: 'leftovers'},
+        {name: "カレー", count: 150, unit: 'g', category: 'fridge-bottom', subCategory: 'leftovers'},
+        {name: "ルイボスティー", count: 500, unit: 'ml', category: 'fridge-bottom', subCategory: 'others'},
+        {name: "卵", count: 5, unit: '個', category: 'fridge-bottom', subCategory: 'others'},
+        {name: "稲荷の皮", count: 3, unit: '個', category: 'fridge-bottom', subCategory: 'others'},
+        {name: "しお", count: 1, unit:'本', category: 'seasoning'},
+        {name: "パルスイート", count: 100, unit:'ml', category: 'seasoning'},
+        {name: "コンソメ", count: 400, unit:'g', category: 'seasoning'},
+        {name: "カップ麺", count: 10, unit: '個', category: 'preserved'},
+        {name: "パスタ", count: 1, unit: '個', category: 'preserved'},
+        {name: "うどん", count: 4, unit: '個', category: 'preserved'},
+    ];
+
+     convertNameToValue(): string {
+        if(this.value === '野菜') {
+            return 'vegetables';
+        } else if(this.value === '残りもの') {
+            return 'leftovers'
+        } else {
+            return 'others';
+        }
+    }
+
+    mounted() {
+        const fridgeBottomLabel = this.convertNameToValue();
+        this.fridgeTop = this.foodStaffSample.filter(staff => staff.category === 'fridge-top');
+        this.fridgeBottom = this.foodStaffSample.filter(staff => staff.category === 'fridge-bottom' && staff.subCategory === fridgeBottomLabel);
+        this.seasoning = this.foodStaffSample.filter(staff => staff.category === 'seasoning');
+        this.preserved = this.foodStaffSample.filter(staff => staff.category === 'preserved');
+    }
+
+    /**
+     * 選択中のタブを切り替え
+     */
+    ontabchange(selected: tabItemLabel) {
+        this.value = selected;
+        this.fridgeBottom = this.foodStaffSample.filter(staff => staff.subCategory === this.convertNameToValue());
+    }
+
+    onclick(seleced: string) {
+    }
+}
+</script>
+
+<style scoped>
+@import url('https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@100;300;400;500;700;800;900&display=swap');
+
+.food_staff_recorder {
+    font-family: 'M PLUS Rounded 1c', sans-serif;
+    display: flex;
+    flex-direction: row;
+}
+.preserved_place_area {
+    width: 50%;
+    height: 600px; /** 仮おき */
+    padding: 10px;
+    background: #FAFAFA;
+}
+.preserved_place_category {
+    width: 100%;
+    height:50%;
+    margin-bottom: 10px;
+}
+.preserved_place_label {
+    font-weight: 700;
+    font-size: 24px;
+    color: #616161;
+    text-align: center;
+}
+.preserved_place_icon {
+    margin-right: 5px;
+}
+.food_staff_list {
+    height: 250px;
+    border-radius: 8px;
+    border: 3px solid #E0E0E0;
+    padding: 5px;
+    margin: 0px 10px 10px 10px;
+}
+.food_staff_list_with_tab {
+    height:165px;
+    margin-top:10px;
+    overflow:scroll;
+}
+.small_category_tab {
+    height: 40px;
+    background: #FAFAFA;
+}
+</style>
