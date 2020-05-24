@@ -3,10 +3,10 @@
         :ripple="{ class: 'white--text' }"
         :class="{'active_tab': isSelected}"
         @click="tabClick"
-        width="200"
+        width="33%"
         height="100%"
         elevation="0"
-        color="#FFFFFF" tile
+        tile text
     >
         <div :class="{'active_category': isSelected}" class="tab_category">
             <v-icon class="tab_icon">{{tabItem.icon}}</v-icon>
@@ -16,7 +16,7 @@
 </template>
 <script lang="ts">
 import { Vue, Component, Prop, Emit } from 'vue-property-decorator';
-import { tabCategory } from '@/components/KakeiboooAppBar.vue';
+import { tabCategory } from '@/components/appbar/KakeiboooAppBar.vue';
 
 @Component({})
 export default class KakeiboooTabItem extends Vue {
@@ -39,7 +39,7 @@ export default class KakeiboooTabItem extends Vue {
 
 <style scoped>
 .tab_item {
-    width: 200px;
+    width: 30%;
     border-bottom: 3px solid #FFFFFF;
 }
 .tab_category {
@@ -49,7 +49,7 @@ export default class KakeiboooTabItem extends Vue {
     display: flex;
 }
 .tab_icon {
-    margin-right: 10px;
+    margin-right: 5px;
 }
 .active_tab {
     border-bottom: 3px solid #FFD600 !important;
