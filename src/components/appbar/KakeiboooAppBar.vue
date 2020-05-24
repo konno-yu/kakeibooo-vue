@@ -6,17 +6,19 @@
             <div class="app_title">KaKeiBooo</div>
         </div>
         <!-- メニュータブ部分 -->
-        <KakeiboooTab :tabItems="tabItems" v-model="value">
-            <template slot-scope="{ tabItems, onTabChange, value }">
-            <KakeiboooTabItem
-                v-for="(tabItem, index) in tabItems"
-                :key="index"
-                :tabItem="tabItem"
-                :isSelected="value === tabItem.label"
-                @change="ontabchange"
-            />
-            </template>
-        </KakeiboooTab>
+        <div class="tab_area">
+            <KakeiboooTab :tabItems="tabItems" v-model="value">
+                <template slot-scope="{ tabItems, onTabChange, value }">
+                <KakeiboooTabItem
+                    v-for="(tabItem, index) in tabItems"
+                    :key="index"
+                    :tabItem="tabItem"
+                    :isSelected="value === tabItem.label"
+                    @change="ontabchange"
+                />
+                </template>
+            </KakeiboooTab>
+        </div>
         <!-- ユーザアカウント部分 -->
         <div class="account_area">
            <v-avatar width="40" height="40"><img src="@/assets/user_account.png"></v-avatar>
@@ -28,8 +30,8 @@
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator';
 
-import KakeiboooTab from '@/components/KakeiboooTab.vue';
-import KakeiboooTabItem from '@/components/KakeiboooTabItem.vue';
+import KakeiboooTab from '@/components/common/KakeiboooTab.vue';
+import KakeiboooTabItem from '@/components/common/KakeiboooTabItem.vue';
 
 export type tabCategory = '家計簿' | '食費管理' | '食材管理';
 
@@ -52,24 +54,29 @@ export default class KakeiboooAppBar extends Vue {
         this.value = selected;
     }
 
+    // タブ要素一覧
+    private tabItems: {label: tabCategory, icon: string}[] = [
+        {label: '家計簿', icon: 'mdi-square-edit-outline'},
+        {label: '食費管理', icon: 'mdi-cart'},
+        {label: '食材管理', icon: 'mdi-one-up'}
+    ];
     /**
      * タブ要素一覧を取得
      */
-    get tabItems(): {label: tabCategory, icon: string}[] {
-        return [
-            {label: '家計簿', icon: 'mdi-square-edit-outline'},
-            {label: '食費管理', icon: 'mdi-cart'},
-            {label: '食材管理', icon: 'mdi-one-up'}
-        ];
-    };
+    // get tabItems(): {label: tabCategory, icon: string}[] {
+    //     return [
+    //         {label: '家計簿', icon: 'mdi-square-edit-outline'},
+    //         {label: '食費管理', icon: 'mdi-cart'},
+    //         {label: '食材管理', icon: 'mdi-one-up'}
+    //     ];
+    // };
 }
 </script>
 
 <style scoped>
 .appbar_root {
-    height: 90px;
+    height: 70px;
     width: 100%;
-    padding: 10px;
     background: #FFFFFF;
     display: flex;
     justify-content: space-around;
@@ -110,5 +117,12 @@ export default class KakeiboooAppBar extends Vue {
     font-size: 18px;
     font-weight: 700;
     color: #616161;
+}
+.tab_area {
+    width: 650px;
+    height: 100%;
+    padding: 10px;
+    display: flex;
+    align-items: center;
 }
 </style>

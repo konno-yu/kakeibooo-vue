@@ -1,5 +1,5 @@
 <template>
-    <div class="tab_area">
+    <div class="kakeibooo_tab">
         <slot v-bind="slotProps" />
     </div>
 </template>
@@ -7,8 +7,8 @@
 <script lang="ts">
 import { Vue, Component, Prop, Emit } from 'vue-property-decorator';
 
-import KakeiboooTabItem from '@/components/KakeiboooTabItem.vue';
-import { tabCategory } from '@/components/KakeiboooAppBar.vue';
+import KakeiboooTabItem from '@/components/common/KakeiboooTabItem.vue';
+import { tabCategory } from '@/components/appbar/KakeiboooAppBar.vue';
 
 @Component({
     components: {
@@ -45,17 +45,8 @@ export default class KakeiboooTab extends Vue {
 </script>
 
 <style scoped>
-.tab_root {
+.kakeibooo_tab {
     width: 100%;
     height: 100%;
-    display: flex;
-    /* justify-content: space-between; */
-}
-.tab_area {
-    width: 650px;
-    height: 100%;
-    padding: 10px;
-    display: flex;
-    align-items: center;
 }
 </style>
