@@ -1,19 +1,20 @@
 <template>
-  <v-app>
-    <div class="root">
-      <KakeiboooAppBar/>
-    </div>
-  </v-app>
+  <div class="root">
+    <KakeiboooAppBar/>
+    <FoodStaffView/>
+  </div>
 </template>
 
 <script lang="ts">
 import { Vue, Component } from 'vue-property-decorator';
 
-import KakeiboooAppBar from '@/components/KakeiboooAppBar.vue';
+import KakeiboooAppBar from '@/components/appbar/KakeiboooAppBar.vue';
+import FoodStaffView from '@/views/FoodStaffView.vue';
 
 @Component({
   components: {
     KakeiboooAppBar,
+    FoodStaffView
   }
 })
 export default class App extends Vue {};
@@ -27,7 +28,7 @@ export default class App extends Vue {};
   width: 100%;
   height: 100%;
   display: flex;
-  flex-flow: "column";
+  flex-flow: column;
   background: #FFFFFF;
 }
 </style>
