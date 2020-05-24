@@ -105,16 +105,7 @@ import FoodStaffList from '@/components/foodstaff/FoodStaffList.vue';
 import FoodStaffListItem from '@/components/foodstaff/FoodStaffListItem.vue';
 import KakeiboooTab from '@/components/common/KakeiboooTab.vue';
 import KakeiboooTabItem from '@/components/common/KakeiboooTabItem.vue';
-import { foodCountUnit } from '@/components/foodstaff/FoodStaffRegister.vue';
-
-type tabItemLabel = '野菜' | '残りもの' | 'その他';
-type foodStaffDetails = {
-    name: string;
-    count: number;
-    unit: foodCountUnit;
-    category: 'fridge-top' | 'fridge-bottom' | 'seasoning' | 'preserved';
-    subCategory?: 'vegetables' | 'leftovers'| 'others';
-}
+import {FoodStaffSubCategoryLabel, FoodStaffSubCategory, FoodStaffDetails } from '@/consts';
 
 @Component({
     components: {
@@ -125,21 +116,21 @@ type foodStaffDetails = {
     }
 })
 export default class FoodStaffRecorder extends Vue {
-    private value: tabItemLabel = '野菜';
+    private value: FoodStaffSubCategoryLabel = '野菜';
 
-    private tabItems: {label: tabItemLabel, icon: string}[] = [
+    private tabItems: {label: FoodStaffSubCategoryLabel, icon: string}[] = [
         {label: '野菜', icon: 'mdi-corn'},
         {label: '残りもの', icon: 'mdi-diamond-stone'},
         {label: 'その他', icon: 'mdi-flower'}
     ];
 
-    private fridgeTop: foodStaffDetails[] = [];
-    private fridgeBottom: foodStaffDetails[] = [];
-    private seasoning: foodStaffDetails[] = [];
-    private preserved: foodStaffDetails[] = [];
+    private fridgeTop: FoodStaffDetails[] = [];
+    private fridgeBottom: FoodStaffDetails[] = [];
+    private seasoning: FoodStaffDetails[] = [];
+    private preserved: FoodStaffDetails[] = [];
 
     // TODO サンプルなのでのちのち消す → 本当はmount時にSVから取得する
-    private foodStaffSample: foodStaffDetails[] = [
+    private foodStaffSample: FoodStaffDetails[] = [
         {name: "豚こま", count: 100, unit:'g', category: 'fridge-top'},
         {name: "鶏むね", count: 150, unit:'g', category: 'fridge-top'},
         {name: "あいびき肉", count: 200, unit:'g', category: 'fridge-top'},
@@ -163,7 +154,7 @@ export default class FoodStaffRecorder extends Vue {
         {name: "うどん", count: 4, unit: '個', category: 'preserved'},
     ];
 
-     convertNameToValue(): string {
+     convertNameToValue(): FoodStaffSubCategory {
         if(this.value === '野菜') {
             return 'vegetables';
         } else if(this.value === '残りもの') {
@@ -184,7 +175,7 @@ export default class FoodStaffRecorder extends Vue {
     /**
      * 選択中のタブを切り替え
      */
-    ontabchange(selected: tabItemLabel) {
+    ontabchange(selected: FoodStaffSubCategoryLabel) {
         this.value = selected;
         this.fridgeBottom = this.foodStaffSample.filter(staff => staff.subCategory === this.convertNameToValue());
     }

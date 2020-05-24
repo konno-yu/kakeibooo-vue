@@ -59,12 +59,12 @@
 <script lang="ts">
 import { Vue, Component, Prop} from 'vue-property-decorator';
 
-export type foodCountUnit = '個' | '本' | '袋' | '束' | '缶' | 'g' | 'ml';
+import { FoodCountUnit } from '@/consts';
 
 @Component({})
 export default class FoodStaffRegister extends Vue {
-    private model: foodCountUnit = '個';
-    private items: foodCountUnit[] = ['個', '本', '袋', '束', '缶', 'g', 'ml'];
+    private model: FoodCountUnit = '個';
+    private items: FoodCountUnit[] = ['個', '本', '袋', '束', '缶', 'g', 'ml'];
     private largeClassSelection: number = 0;
     private smallClassSelection: number = 1;
 }
