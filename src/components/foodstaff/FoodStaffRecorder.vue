@@ -223,6 +223,7 @@ export default class FoodStaffRecorder extends Vue {
     margin-right: 5px;
 }
 .food_staff_list {
+    background: #FFFFFF;
     height: 250px;
     border-radius: 8px;
     border: 3px solid #E0E0E0;
@@ -236,6 +237,6 @@ export default class FoodStaffRecorder extends Vue {
 }
 .small_category_tab {
     height: 40px;
-    background: #FAFAFA;
+    background: #FFFFFF;
 }
 </style>
