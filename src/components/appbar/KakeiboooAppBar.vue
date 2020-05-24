@@ -32,9 +32,7 @@ import { Vue, Component, Prop } from 'vue-property-decorator';
 
 import KakeiboooTab from '@/components/common/KakeiboooTab.vue';
 import KakeiboooTabItem from '@/components/common/KakeiboooTabItem.vue';
-
-export type tabCategory = '家計簿' | '食費管理' | '食材管理';
-
+import { AppbarTabCategory } from '@/consts';
 
 @Component({
     components: {
@@ -45,31 +43,21 @@ export type tabCategory = '家計簿' | '食費管理' | '食材管理';
 export default class KakeiboooAppBar extends Vue {
     private userName: string = 'コンノ';
     // タブで選択中の要素のラベル
-    private value: tabCategory = '家計簿';
+    private value: AppbarTabCategory = '家計簿';
 
     /**
      * 選択中のタブを切り替え
      */
-    ontabchange(selected: tabCategory) {
+    ontabchange(selected: AppbarTabCategory) {
         this.value = selected;
     }
 
     // タブ要素一覧
-    private tabItems: {label: tabCategory, icon: string}[] = [
+    private tabItems: {label: AppbarTabCategory, icon: string}[] = [
         {label: '家計簿', icon: 'mdi-square-edit-outline'},
         {label: '食費管理', icon: 'mdi-cart'},
         {label: '食材管理', icon: 'mdi-one-up'}
     ];
-    /**
-     * タブ要素一覧を取得
-     */
-    // get tabItems(): {label: tabCategory, icon: string}[] {
-    //     return [
-    //         {label: '家計簿', icon: 'mdi-square-edit-outline'},
-    //         {label: '食費管理', icon: 'mdi-cart'},
-    //         {label: '食材管理', icon: 'mdi-one-up'}
-    //     ];
-    // };
 }
 </script>
 

@@ -8,6 +8,7 @@
 import { Vue, Component, Prop } from 'vue-property-decorator';
 
 import FoodStaffListItem from '@/components/foodstaff/FoodStaffListItem.vue';
+import { FoodStaffDetails } from '@/consts';
 
 @Component({
     components: {
@@ -16,7 +17,7 @@ import FoodStaffListItem from '@/components/foodstaff/FoodStaffListItem.vue';
 })
 export default class FoodStaffList extends Vue {
     @Prop({})
-    private listItems!: {name: string, count: number, unit:string, category: string, subCategory?:string}[];
+    private listItems!: FoodStaffDetails[];
 
     get slotPlops() {
         return {

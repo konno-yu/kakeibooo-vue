@@ -11,11 +11,12 @@
 
 <script lang="ts">
 import { Vue, Prop, Component } from 'vue-property-decorator';
+import { FoodStaffDetails } from '@/consts';
 
 @Component({})
 export default class FoodStaffListItem extends Vue {
     @Prop({})
-    listItem!: {name: string, count: number};
+    listItem!: FoodStaffDetails;
 
     onClick() {
     }

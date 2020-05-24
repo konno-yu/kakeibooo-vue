@@ -16,13 +16,13 @@
 </template>
 <script lang="ts">
 import { Vue, Component, Prop, Emit } from 'vue-property-decorator';
-import { tabCategory } from '@/components/appbar/KakeiboooAppBar.vue';
+import { AppbarTabCategory } from '@/consts';
 
 @Component({})
 export default class KakeiboooTabItem extends Vue {
     // 描画対象のタブ要素
     @Prop({required: true, default: {}})
-    tabItem!: {label: tabCategory, icon: string};
+    tabItem!: {label: AppbarTabCategory, icon: string};
     // 対象のタブ要素が選択中がどうか
     @Prop({type: Boolean, required: true})
     isSelected!: boolean;
