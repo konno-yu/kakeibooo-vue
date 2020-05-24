@@ -8,7 +8,7 @@
 import { Vue, Component, Prop, Emit } from 'vue-property-decorator';
 
 import KakeiboooTabItem from '@/components/common/KakeiboooTabItem.vue';
-import { tabCategory } from '@/components/appbar/KakeiboooAppBar.vue';
+import { AppbarTabCategory } from '@/consts';
 
 @Component({
     components: {
@@ -18,10 +18,10 @@ import { tabCategory } from '@/components/appbar/KakeiboooAppBar.vue';
 export default class KakeiboooTab extends Vue {
     // 全てのタブ要素
     @Prop({required: true, default: []})
-    private tabItems!: {label: tabCategory, icon: string}[];
+    private tabItems!: {label: AppbarTabCategory, icon: string}[];
     // 選択中のタブのラベル名
     @Prop({required: true, default: ''})
-    private value!: tabCategory;
+    private value!: AppbarTabCategory;
 
     /**
      * 親要素（KakeiboooAppBar）から送られてくるpropsを取得
@@ -38,7 +38,7 @@ export default class KakeiboooTab extends Vue {
      * 選択中のタブを切り替え
      * 親要素に切り替え後のタブラベルを伝搬させる
      */
-    ontabchange(selected: tabCategory) {
+    ontabchange(selected: AppbarTabCategory) {
         this.$emit('change', selected);
     }
 }
