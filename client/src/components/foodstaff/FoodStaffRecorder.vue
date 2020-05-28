@@ -105,7 +105,7 @@ import FoodStaffList from '@/components/foodstaff/FoodStaffList.vue';
 import FoodStaffListItem from '@/components/foodstaff/FoodStaffListItem.vue';
 import KakeiboooTab from '@/components/common/KakeiboooTab.vue';
 import KakeiboooTabItem from '@/components/common/KakeiboooTabItem.vue';
-import {FoodStaffSubCategoryLabel, FoodStaffSubCategory, FoodStaffDetails } from '@/consts';
+import {FoodStaffSubCategoryLabel, FoodStaffSubCategory, FoodStaffDetails } from '../../consts';
 
 @Component({
     components: {

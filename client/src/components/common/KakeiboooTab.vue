@@ -8,7 +8,7 @@
 import { Vue, Component, Prop, Emit } from 'vue-property-decorator';
 
 import KakeiboooTabItem from '@/components/common/KakeiboooTabItem.vue';
-import { AppbarTabCategory } from '@/consts';
+import { AppbarTabCategory } from '../../consts';
 
 @Component({
     components: {

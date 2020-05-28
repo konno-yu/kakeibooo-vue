@@ -8,7 +8,7 @@
 import { Vue, Component, Prop } from 'vue-property-decorator';
 
 import FoodStaffListItem from '@/components/foodstaff/FoodStaffListItem.vue';
-import { FoodStaffDetails } from '@/consts';
+import { FoodStaffDetails } from '../../consts';
 
 @Component({
     components: {

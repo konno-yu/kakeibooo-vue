@@ -59,7 +59,7 @@
 <script lang="ts">
 import { Vue, Component, Prop} from 'vue-property-decorator';
 
-import { FoodCountUnit } from '@/consts';
+import { FoodCountUnit } from '../../consts';
 
 @Component({})
 export default class FoodStaffRegister extends Vue {

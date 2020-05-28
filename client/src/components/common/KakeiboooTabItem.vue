@@ -16,7 +16,7 @@
 </template>
 <script lang="ts">
 import { Vue, Component, Prop, Emit } from 'vue-property-decorator';
-import { AppbarTabCategory } from '@/consts';
+import { AppbarTabCategory } from '../../consts';
 
 @Component({})
 export default class KakeiboooTabItem extends Vue {
