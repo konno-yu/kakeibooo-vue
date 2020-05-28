@@ -1,7 +1,7 @@
 <template>
     <div class="list_item_root">
-        <div class="list_name">{{listItem.name}}</div>
-        <div class="list_count">{{listItem.count}} ml</div>
+        <div class="list_name">{{listItem.staffName}}</div>
+        <div class="list_count">{{listItem.staffCount}} {{listItem.unit}}</div>
         <div class="list_action">
             <v-btn @click="onClick" class="list_action_button" color="#FF8A80" elevation="0" height="30" width="75" small>買った！</v-btn>
             <v-btn @click="onClick" class="list_action_button" color="#80CBC4" elevation="0" height="30" width="75" small>使った！</v-btn>
@@ -11,7 +11,7 @@
 
 <script lang="ts">
 import { Vue, Prop, Component } from 'vue-property-decorator';
-import { FoodStaffDetails } from '@/consts';
+import { FoodStaffDetails } from '../../consts';
 
 @Component({})
 export default class FoodStaffListItem extends Vue {

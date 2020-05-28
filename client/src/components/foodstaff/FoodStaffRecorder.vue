@@ -106,6 +106,7 @@ import FoodStaffListItem from '@/components/foodstaff/FoodStaffListItem.vue';
 import KakeiboooTab from '@/components/common/KakeiboooTab.vue';
 import KakeiboooTabItem from '@/components/common/KakeiboooTabItem.vue';
 import {FoodStaffSubCategoryLabel, FoodStaffSubCategory, FoodStaffDetails } from '../../consts';
+import axios from 'axios';
 
 @Component({
     components: {
@@ -129,30 +130,7 @@ export default class FoodStaffRecorder extends Vue {
     private seasoning: FoodStaffDetails[] = [];
     private preserved: FoodStaffDetails[] = [];
 
-    // TODO サンプルなのでのちのち消す → 本当はmount時にSVから取得する
-    private foodStaffSample: FoodStaffDetails[] = [
-        {name: "豚こま", count: 100, unit:'g', category: 'fridge-top'},
-        {name: "鶏むね", count: 150, unit:'g', category: 'fridge-top'},
-        {name: "あいびき肉", count: 200, unit:'g', category: 'fridge-top'},
-        {name: "枝豆", count: 1, unit:'袋', category: 'fridge-top'},
-        {name: "大根", count: 0.2, unit: '本', category: 'fridge-bottom', subCategory: 'vegetables'},
-        {name: "人参", count: 0.5, unit: '本', category: 'fridge-bottom', subCategory: 'vegetables'},
-        {name: "じゃがいも", count: 3, unit: '個', category: 'fridge-bottom', subCategory: 'vegetables'},
-        {name: "白菜", count: 1, unit: '本', category: 'fridge-bottom', subCategory: 'vegetables'},
-        {name: "きゅうり", count: 2, unit: '個', category: 'fridge-bottom', subCategory: 'vegetables'},
-        {name: "肉じゃが", count: 100, unit: 'g', category: 'fridge-bottom', subCategory: 'leftovers'},
-        {name: "水菜サラダ", count: 100, unit: 'g', category: 'fridge-bottom', subCategory: 'leftovers'},
-        {name: "カレー", count: 150, unit: 'g', category: 'fridge-bottom', subCategory: 'leftovers'},
-        {name: "ルイボスティー", count: 500, unit: 'ml', category: 'fridge-bottom', subCategory: 'others'},
-        {name: "卵", count: 5, unit: '個', category: 'fridge-bottom', subCategory: 'others'},
-        {name: "稲荷の皮", count: 3, unit: '個', category: 'fridge-bottom', subCategory: 'others'},
-        {name: "しお", count: 1, unit:'本', category: 'seasoning'},
-        {name: "パルスイート", count: 100, unit:'ml', category: 'seasoning'},
-        {name: "コンソメ", count: 400, unit:'g', category: 'seasoning'},
-        {name: "カップ麺", count: 10, unit: '個', category: 'preserved'},
-        {name: "パスタ", count: 1, unit: '個', category: 'preserved'},
-        {name: "うどん", count: 4, unit: '個', category: 'preserved'},
-    ];
+    private foodStaffSample: FoodStaffDetails[] = [];
 
      convertNameToValue(): FoodStaffSubCategory {
         if(this.value === '野菜') {
@@ -164,12 +142,19 @@ export default class FoodStaffRecorder extends Vue {
         }
     }
 
+    async getAllFoodStaffs() {
+        await axios.get('http://localhost:3000/foodstaffs').then(res => {
+            this.foodStaffSample = res.data;
+            const fridgeBottomLabel = this.convertNameToValue();
+            this.fridgeTop = this.foodStaffSample.filter(staff => staff.category === 'fridge-top');
+            this.fridgeBottom = this.foodStaffSample.filter(staff => staff.category === 'fridge-bottom' && staff.subCategory === fridgeBottomLabel);
+            this.seasoning = this.foodStaffSample.filter(staff => staff.category === 'seasoning');
+            this.preserved = this.foodStaffSample.filter(staff => staff.category === 'preserved');
+        });
+    }
+
     mounted() {
-        const fridgeBottomLabel = this.convertNameToValue();
-        this.fridgeTop = this.foodStaffSample.filter(staff => staff.category === 'fridge-top');
-        this.fridgeBottom = this.foodStaffSample.filter(staff => staff.category === 'fridge-bottom' && staff.subCategory === fridgeBottomLabel);
-        this.seasoning = this.foodStaffSample.filter(staff => staff.category === 'seasoning');
-        this.preserved = this.foodStaffSample.filter(staff => staff.category === 'preserved');
+        this.getAllFoodStaffs();
     }
 
     /**
