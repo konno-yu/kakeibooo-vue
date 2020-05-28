@@ -2,7 +2,7 @@ import { Module } from '@nestjs/common';
 import { FoodstaffsController } from './foodstaffs.controller';
 import { FoodstaffsService } from './foodstaffs.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { Foodstaff } from './foodstaff.entity';
+import { Foodstaff } from './foodStaff.entity';
 
 @Module({
     imports: [ TypeOrmModule.forFeature([Foodstaff])],
