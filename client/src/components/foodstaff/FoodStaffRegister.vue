@@ -4,18 +4,18 @@
             <!-- 買った品名 -->
             <div class="bought_food">
                 <div class="bought_food_label">買ったもの</div>
-                <div><v-text-field color="#E0E0E0" dense outlined flat solo /></div>
+                <div><v-text-field v-model="staffName" color="#E0E0E0" dense outlined flat solo /></div>
             </div>
             <!-- 買った個数-->
             <div class="bought_food">
                 <div class="bought_food_label">個数</div>
                 <div id="bought_food_count">
-                    <div class="food_count"><v-text-field color="#E0E0E0" dense outlined solo flat clearable /></div>
+                    <div class="food_count"><v-text-field v-model="staffCount" color="#E0E0E0" dense outlined solo flat clearable /></div>
                     <div class="food_unit">
                         <v-select
                             style="color: 'white"
                             item-color="yellow accent-4"
-                            v-model="model"
+                            v-model="unit"
                             :items="items"
                             color="#E0E0E0"
                             dense
@@ -63,7 +63,9 @@ import { FoodCountUnit } from '../../consts';
 
 @Component({})
 export default class FoodStaffRegister extends Vue {
-    private model: FoodCountUnit = '個';
+    private staffName: string = '';
+    private staffCount: number | string = '';
+    private unit: FoodCountUnit = '個';
     private items: FoodCountUnit[] = ['個', '本', '袋', '束', '缶', 'g', 'ml'];
     private largeClassSelection: number = 0;
     private smallClassSelection: number = 1;
