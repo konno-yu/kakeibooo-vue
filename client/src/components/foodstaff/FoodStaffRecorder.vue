@@ -130,16 +130,8 @@ export default class FoodStaffRecorder extends Vue {
     private seasoning: FoodStaffDetails[] = [];
     private preserved: FoodStaffDetails[] = [];
 
-    private foodStaffSample: FoodStaffDetails[] = [];
+    private foodStaffs: FoodStaffDetails[] = [];
 
-     convertNameToValue(): FoodStaffSubCategory {
-        if(this.value === '野菜') {
-            return 'vegetables';
-        } else if(this.value === '残りもの') {
-            return 'leftovers'
-        } else {
-            return 'others';
-        }
     }
 
     async getAllFoodStaffs() {
@@ -151,6 +143,11 @@ export default class FoodStaffRecorder extends Vue {
             this.seasoning = this.foodStaffSample.filter(staff => staff.category === 'seasoning');
             this.preserved = this.foodStaffSample.filter(staff => staff.category === 'preserved');
         });
+    /**
+     * 冷蔵庫のカテゴリ名をDBに格納する値に変換する
+     */
+    convertCategoryNameToValue(): FoodStaffSubCategory {
+         return this.subCategoryMap[this.value];
     }
 
     mounted() {
@@ -162,7 +159,7 @@ export default class FoodStaffRecorder extends Vue {
      */
     ontabchange(selected: FoodStaffSubCategoryLabel) {
         this.value = selected;
-        this.fridgeBottom = this.foodStaffSample.filter(staff => staff.subCategory === this.convertNameToValue());
+        this.fridgeBottom = this.foodStaffs.filter(staff => staff.subCategory === this.convertCategoryNameToValue());
     }
 
     onclick(seleced: string) {
