@@ -132,6 +132,10 @@ export default class FoodStaffRecorder extends Vue {
 
     private foodStaffs: FoodStaffDetails[] = [];
 
+    private subCategoryMap: {[key: string]: FoodStaffSubCategory} = {
+        '野菜': 'vegetables',
+        '残りもの': 'leftovers',
+        'その他': 'others'
     }
 
     async getAllFoodStaffs() {
