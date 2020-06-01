@@ -1,33 +1,33 @@
 import { Controller, Get, Post, Put, Delete, Body, Param } from '@nestjs/common';
 import { FoodstaffsService } from './foodstaffs.service';
-import { FoodstaffDTO } from './foodstaff.dto';
+import { FoodstaffDto } from './foodstaff.dto';
 
 @Controller('foodstaffs')
 export class FoodstaffsController {
     constructor(private foodStaffService: FoodstaffsService) {}
 
     @Get()
-    getAllStaffs() {
-        return this.foodStaffService.getAllStaffs();
+    getAll() {
+        return this.foodStaffService.getAll();
     }
 
     @Get(':id')
-    getStaffById(@Param('id') id: number) {
-        return this.foodStaffService.getStaffById(id);
+    getById(@Param('id') id: number) {
+        return this.foodStaffService.getById(id);
     }
 
     @Post()
-    postStaff(@Body() data: FoodstaffDTO) {
-        return this.foodStaffService.postStaff(data);
+    post(@Body() data: FoodstaffDto) {
+        return this.foodStaffService.post(data);
     }
 
     @Put(':id')
-    updateStaff(@Param('id') id: number, @Body() data: Partial<FoodstaffDTO>) {
-        return this.foodStaffService.updateStaff(id, data);
+    update(@Param('id') id: number, @Body() data: Partial<FoodstaffDto>) {
+        return this.foodStaffService.update(id, data);
     }
 
     @Delete(':id')
-    deleteStaff(@Param('id') id: number) {
-        return this.foodStaffService.deleteStaff(id);
+    delete(@Param('id') id: number) {
+        return this.foodStaffService.delete(id);
     }
 }
