@@ -108,6 +108,8 @@ import KakeiboooTabItem from '@/components/common/KakeiboooTabItem.vue';
 import {FoodStaffSubCategoryLabel, FoodStaffSubCategory, FoodStaffDetails } from '../../consts';
 import axios from 'axios';
 
+import { getAll } from '../../apis/foodStaffApi';
+
 @Component({
     components: {
         FoodStaffList,
@@ -138,15 +140,6 @@ export default class FoodStaffRecorder extends Vue {
         'その他': 'others'
     }
 
-    async getAllFoodStaffs() {
-        await axios.get('http://localhost:3000/foodstaffs').then(res => {
-            this.foodStaffSample = res.data;
-            const fridgeBottomLabel = this.convertNameToValue();
-            this.fridgeTop = this.foodStaffSample.filter(staff => staff.category === 'fridge-top');
-            this.fridgeBottom = this.foodStaffSample.filter(staff => staff.category === 'fridge-bottom' && staff.subCategory === fridgeBottomLabel);
-            this.seasoning = this.foodStaffSample.filter(staff => staff.category === 'seasoning');
-            this.preserved = this.foodStaffSample.filter(staff => staff.category === 'preserved');
-        });
     /**
      * 冷蔵庫のカテゴリ名をDBに格納する値に変換する
      */
@@ -155,7 +148,14 @@ export default class FoodStaffRecorder extends Vue {
     }
 
     mounted() {
-        this.getAllFoodStaffs();
+        // データベースに登録された食材を画面に表示する
+        getAll().then(response => {
+            this.foodStaffs = response.data;
+            this.fridgeTop = this.foodStaffs.filter(staff => staff.category === 'fridge-top');
+            this.fridgeBottom = this.foodStaffs.filter(staff => staff.category === 'fridge-bottom' && staff.subCategory === this.convertCategoryNameToValue());
+            this.seasoning = this.foodStaffs.filter(staff => staff.category === 'seasoning');
+            this.preserved = this.foodStaffs.filter(staff => staff.category === 'preserved');
+        });
     }
 
     /**
