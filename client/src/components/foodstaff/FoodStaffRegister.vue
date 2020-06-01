@@ -48,7 +48,7 @@
             </div>
             <!-- 登録ボタン -->
             <div id="register_food_staff">
-                <v-btn color="#FFD600" elevation="0" width="100%" height="50">
+                <v-btn color="#FFD600" elevation="0" width="100%" height="50" @click="post">
                     <div id="register_button_label">食材を登録!</div>
                 </v-btn>
             </div>
@@ -59,7 +59,8 @@
 <script lang="ts">
 import { Vue, Component, Prop} from 'vue-property-decorator';
 
-import { FoodCountUnit } from '../../consts';
+import { FoodCountUnit, FoodStaffCategory, FoodStaffSubCategory, FoodStaffDetails } from '../../consts';
+import { post } from '../../apis/foodStaffApi';
 
 @Component({})
 export default class FoodStaffRegister extends Vue {
@@ -68,7 +69,40 @@ export default class FoodStaffRegister extends Vue {
     private unit: FoodCountUnit = '個';
     private items: FoodCountUnit[] = ['個', '本', '袋', '束', '缶', 'g', 'ml'];
     private largeClassSelection: number = 0;
-    private smallClassSelection: number = 1;
+    private smallClassSelection: number = 0;
+
+    private largetClassMap: FoodStaffCategory[] = ['fridge-top', 'fridge-bottom', 'seasoning', 'preserved'];
+    private smallClassMap: FoodStaffSubCategory[] = ['vegetables', 'leftovers', 'others'];
+
+    /**
+     * 保存場所の通し番号を値に変換する
+     */
+    convertSelectionToCategory(): FoodStaffCategory {
+        return this.largetClassMap[this.largeClassSelection];
+    };
+
+    /**
+     * 冷蔵庫内の保存場所の通し番号を値に変換する
+     */
+    convertSelectionToSubCategory(): FoodStaffSubCategory | null {
+        // 冷蔵庫以外はnullを返しておく
+        return (this.largeClassSelection !== 1) ? null : this.smallClassMap[this.smallClassSelection];
+    }
+
+    post() {
+        const requestBody: FoodStaffDetails = {
+            staffName: this.staffName,
+            staffCount: +this.staffCount,
+            unit: this.unit,
+            category: this.convertSelectionToCategory(),
+            subCategory: this.convertSelectionToSubCategory()
+        };
+        post(requestBody).then(response => {
+            // TODO 正常時の分岐もあったほうがよい
+            // TODO エラー処理も後々必要になりそう
+            location.reload();
+        })
+    }
 }
 </script>
 
