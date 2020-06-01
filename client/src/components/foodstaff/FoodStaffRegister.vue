@@ -39,7 +39,7 @@
                 </div>
                 <!-- 保存場所（小分類）-->
                 <div v-show="largeClassSelection === 1" id="small_class_selection">
-                    <v-btn-toggle v-model="smallClassSelection" background-color="#FAFAFA" color="#FFD600">
+                    <v-btn-toggle v-model="smallClassSelection" background-color="#FAFAFA" color="#FFD600" mandatory>
                         <v-btn><v-icon color="#616161">mdi-corn</v-icon></v-btn>
                         <v-btn><v-icon color="#616161">mdi-diamond-stone</v-icon></v-btn>
                         <v-btn><v-icon color="#616161">mdi-flower</v-icon></v-btn>
