@@ -4,10 +4,11 @@ export type FoodCountUnit = '個' | '本' | '袋' | '束' | '缶' | 'g' | 'ml';
 export type FoodStaffCategory = 'fridge-top' | 'fridge-bottom' | 'seasoning' | 'preserved';
 export type FoodStaffSubCategory = 'vegetables' | 'leftovers'| 'others';
 export type FoodStaffSubCategoryLabel = '野菜' | '残りもの'| 'その他';
+
 export type FoodStaffDetails = {
-    name: string;
-    count: number;
+    staffName: string;
+    staffCount: number;
     unit: FoodCountUnit;
     category: FoodStaffCategory;
-    subCategory?: FoodStaffSubCategory;
+    subCategory?: FoodStaffSubCategory | null;
 }
