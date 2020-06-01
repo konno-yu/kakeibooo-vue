@@ -32,7 +32,7 @@ import { Vue, Component, Prop } from 'vue-property-decorator';
 
 import KakeiboooTab from '@/components/common/KakeiboooTab.vue';
 import KakeiboooTabItem from '@/components/common/KakeiboooTabItem.vue';
-import { AppbarTabCategory } from '@/consts';
+import { AppbarTabCategory } from '../../consts';
 
 @Component({
     components: {
