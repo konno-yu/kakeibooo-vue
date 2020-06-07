@@ -9,8 +9,8 @@ export const config: TypeOrmModuleOptions = {
     port: 5432,
     host: 'localhost',
     database: 'kakeibooo',
-    synchronize: true,
+    synchronize: false,
     entities: [Foodstaff],
-    logging: false,//true,
+    logging: true,
     namingStrategy: new SnakeNamingStrategy()
 };
