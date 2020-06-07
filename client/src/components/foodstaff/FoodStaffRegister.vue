@@ -91,6 +91,7 @@ export default class FoodStaffRegister extends Vue {
 
     post() {
         const requestBody: FoodStaffDetails = {
+            id: 0,
             staffName: this.staffName,
             staffCount: +this.staffCount,
             unit: this.unit,

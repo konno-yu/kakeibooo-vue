@@ -20,6 +20,7 @@ export class FoodstaffsService {
 
     async post(data: FoodstaffDto) {
         const staff = this.foodstaffRepository.create(data);
+        staff.inputDate = new Date();
         await this.foodstaffRepository.save(staff);
         return staff;
     }
