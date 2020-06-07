@@ -6,6 +6,7 @@ export type FoodStaffSubCategory = 'vegetables' | 'leftovers'| 'others';
 export type FoodStaffSubCategoryLabel = '野菜' | '残りもの'| 'その他';
 
 export type FoodStaffDetails = {
+    id: number;
     staffName: string;
     staffCount: number;
     unit: FoodCountUnit;
