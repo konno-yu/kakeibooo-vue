@@ -171,11 +171,85 @@
 <script lang="ts">
 import { Vue, Prop, Component } from 'vue-property-decorator';
 import { FoodStaffDetails } from '../../consts';
+import { updateById, deleteById } from '../../apis/foodStaffApi';
 
 @Component({})
 export default class FoodStaffListItem extends Vue {
     @Prop({})
     listItem!: FoodStaffDetails;
+
+    private isOpenBuyDlg:boolean = false;
+    private isOpenUseDlg: boolean = false;
+    private count: number = 0;
+
+    // テキストFに負の値が入力されたときのエラーメッセージ
+    private isInputMinus = (value: number) => value >= 0 || '正の値を入力してください';
+    // テキストFに入力された値によって保存量がマイナスになったときのエラーメッセージ
+    private isResultMinus = (value: number) => value <= this.listItem.staffCount || '使った量が保存量を超えます';
+
+    /**
+     * DLGのOKボタンが押せるかどうかを判定
+     */
+    canClickOkButton() {
+        if(this.isOpenBuyDlg) {
+            // 「買ったよ！」DLGでは負数の入力は許容しない
+            return this.count < 0;
+        } else {
+            // 「使ったよ！」DLGでは負数の入力 および 保存量以上の使用量は許容しない
+            return this.count < 0 || this.count > this.listItem.staffCount;
+        }
+    }
+
+
+    /**
+     * 買った個数を増やす
+     */
+    addBuyCount(value: number) {
+        this.count = Number(this.count) + value;
+    }
+
+    /**
+     * 使った個数を増やす
+     */
+    addUseCount(value: 'all' | 'half') {
+        this.count = (value === 'all') ? this.count = this.listItem.staffCount : this.count = (this.listItem.staffCount / 2);
+    }
+
+    /**
+     * キャンセルボタンを押してDLGを閉じる
+     */
+    closeDialog() {
+        this.count = 0;
+        this.isOpenBuyDlg = false;
+        this.isOpenUseDlg = false;
+        return
+    }
+
+    /**
+     * OKボタンを押してDLGを閉じる
+     */
+    closeDialogWithUpdate(mode: 'buy' | 'use') {
+        const targetId = this.listItem.id;
+        const responseBody: Partial<FoodStaffDetails> = {
+            staffCount: (mode === 'buy') ? Number(this.count) + this.listItem.staffCount : this.listItem.staffCount - Number(this.count)
+        };
+
+        if(responseBody.staffCount === 0) {
+            // 食材を使った結果残りが0になった場合は、DELETEを投げる
+            deleteById(targetId).then(response => {
+                if(response.status === 200) {
+                    location.reload();
+                }
+            });
+            return;
+        }
+        // 基本的にはPUTを投げる
+        updateById(targetId, responseBody).then(response => {
+            if(response.status === 200) {
+                location.reload();
+            }
+        });
+    }
 
     onClick() {
     }
