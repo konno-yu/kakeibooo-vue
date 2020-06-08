@@ -3,11 +3,11 @@
         <!-- サービスタイトル部分 -->
         <div class="title_area">
             <v-icon large color="#FFD600">mdi-reddit</v-icon>
-            <div class="app_title">KaKeiBooo</div>
+            <div class="app_title">{{headerElement.appTitle}}</div>
         </div>
         <!-- メニュータブ部分 -->
         <div class="tab_area">
-            <KakeiboooTab :tabItems="tabItems" v-model="value">
+            <KakeiboooTab :tabItems="tabItems" v-model="headerElement.selectedTab">
                 <template slot-scope="{ tabItems, onTabChange, value }">
                 <KakeiboooTabItem
                     v-for="(tabItem, index) in tabItems"
@@ -22,43 +22,51 @@
         <!-- ユーザアカウント部分 -->
         <div class="account_area">
            <v-avatar width="40" height="40"><img src="@/assets/user_account.png"></v-avatar>
-           <div class="avatar_name">{{this.userName}}のおサイフ</div>
+           <div class="avatar_name">{{headerElement.userName}}のおサイフ</div>
         </div>
     </div>
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop } from 'vue-property-decorator';
-
+// import { Vue, Component, Prop } from 'vue-property-decorator';
+import { defineComponent, reactive } from '@vue/composition-api';
 import KakeiboooTab from '@/components/common/KakeiboooTab.vue';
 import KakeiboooTabItem from '@/components/common/KakeiboooTabItem.vue';
 import { AppbarTabCategory } from '../../consts';
 
-@Component({
+type HeaderElement = {
+    appTitle: string,
+    userName: string,
+    selectedTab: AppbarTabCategory
+};
+
+export default defineComponent({
     components: {
         KakeiboooTab,
         KakeiboooTabItem
-    }
-})
-export default class KakeiboooAppBar extends Vue {
-    private userName: string = 'コンノ';
-    // タブで選択中の要素のラベル
-    private value: AppbarTabCategory = '家計簿';
+    },
 
-    /**
-     * 選択中のタブを切り替え
-     */
-    ontabchange(selected: AppbarTabCategory) {
-        this.value = selected;
-    }
-
-    // タブ要素一覧
-    private tabItems: {label: AppbarTabCategory, icon: string}[] = [
+    setup(props, ctx) {
+        const headerElement = reactive<HeaderElement>({
+            appTitle: 'KaKeiBooo',
+            userName: 'コンノ',
+            selectedTab: '家計簿'
+        });
+        const tabItems: {label: AppbarTabCategory, icon: string}[] = [
         {label: '家計簿', icon: 'mdi-square-edit-outline'},
         {label: '食費管理', icon: 'mdi-cart'},
         {label: '食材管理', icon: 'mdi-one-up'}
-    ];
-}
+        ];
+
+        const ontabchange = (selected: AppbarTabCategory) => {
+            headerElement.selectedTab = selected;
+        }
+
+        return {
+            headerElement, tabItems, ontabchange
+        }
+    }
+})
 </script>
 
 <style scoped>
