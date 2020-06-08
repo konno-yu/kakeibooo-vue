@@ -6,18 +6,16 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component } from 'vue-property-decorator';
-
+import { defineComponent } from '@vue/composition-api';
 import KakeiboooAppBar from '@/components/appbar/KakeiboooAppBar.vue';
 import FoodStaffView from '@/views/FoodStaffView.vue';
 
-@Component({
+export default defineComponent({
   components: {
     KakeiboooAppBar,
     FoodStaffView
   }
-})
-export default class App extends Vue {};
+});
 </script>
 
 <style scoped>
