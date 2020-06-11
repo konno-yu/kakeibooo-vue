@@ -4,7 +4,7 @@
         <div class="list_count">{{listItem.staffCount}} {{listItem.unit}}</div>
         <div class="list_action">
             <v-btn
-                @click="isOpenBuyDlg=true"
+                @click="isOpenBuy=true"
                 class="list_action_button"
                 color="#FF8A80"
                 elevation="0"
@@ -15,7 +15,7 @@
                 買った！
             </v-btn>
             <v-btn
-                @click="isOpenUseDlg=true"
+                @click="isOpenUse=true"
                 class="list_action_button"
                 color="#80CBC4"
                 elevation="0"
@@ -27,7 +27,7 @@
             </v-btn>
 
             <!-- 「買ったよ！」DLG -->
-            <v-dialog v-model="isOpenBuyDlg" width="600" height="360">
+            <v-dialog v-model="isOpenBuy" width="600" height="360">
                 <v-card>
                     <div class="dialog-title red accent-1">
                         <v-card-title class="red accent-1">「買ったよ！」</v-card-title>
@@ -97,7 +97,7 @@
             </v-dialog>
 
             <!-- 「使ったよ！」DLG -->
-            <v-dialog v-model="isOpenUseDlg" width="600" height="360">
+            <v-dialog v-model="isOpenUse" width="600" height="360">
                 <v-card>
                     <div class="dialog-title teal lighten-3">
                         <v-card-title class="teal lighten-3">「使ったよ！」</v-card-title>
@@ -169,94 +169,105 @@
 </template>
 
 <script lang="ts">
-import { Vue, Prop, Component } from 'vue-property-decorator';
+import { defineComponent, reactive, ref, toRefs } from '@vue/composition-api';
 import { FoodStaffDetails } from '../../consts';
 import { updateById, deleteById } from '../../apis/foodStaffApi';
 
-@Component({})
-export default class FoodStaffListItem extends Vue {
-    @Prop({})
-    listItem!: FoodStaffDetails;
-
-    private isOpenBuyDlg:boolean = false;
-    private isOpenUseDlg: boolean = false;
-    private count: number = 0;
-
-    // テキストFに負の値が入力されたときのエラーメッセージ
-    private isInputMinus = (value: number) => value >= 0 || '正の値を入力してください';
-    // テキストFに入力された値によって保存量がマイナスになったときのエラーメッセージ
-    private isResultMinus = (value: number) => value <= this.listItem.staffCount || '使った量が保存量を超えます';
-
-    /**
-     * DLGのOKボタンが押せるかどうかを判定
-     */
-    canClickOkButton() {
-        if(this.isOpenBuyDlg) {
-            // 「買ったよ！」DLGでは負数の入力は許容しない
-            return this.count < 0;
-        } else {
-            // 「使ったよ！」DLGでは負数の入力 および 保存量以上の使用量は許容しない
-            return this.count < 0 || this.count > this.listItem.staffCount;
+export default defineComponent({
+    props: {
+        listItem: {
+            type: Object as () => FoodStaffDetails,
+            required: true
         }
-    }
+    },
+    setup(props) {
+        const dialogState = reactive<{isOpenBuy: boolean, isOpenUse: boolean, count: number}>({
+            isOpenBuy: false,
+            isOpenUse: false,
+            count: 0
+        });
 
+        // テキストFに負の値が入力されたときのエラーメッセージ
+        const isInputMinus = (value: number) => value >= 0 || '正の値を入力してください';
+        // テキストFに入力された値によって保存量がマイナスになったときのエラーメッセージ
+        const isResultMinus = (value: number) => value <= props.listItem.staffCount || '使った量が保存量を超えます';
 
-    /**
-     * 買った個数を増やす
-     */
-    addBuyCount(value: number) {
-        this.count = Number(this.count) + value;
-    }
-
-    /**
-     * 使った個数を増やす
-     */
-    addUseCount(value: 'all' | 'half') {
-        this.count = (value === 'all') ? this.count = this.listItem.staffCount : this.count = (this.listItem.staffCount / 2);
-    }
-
-    /**
-     * キャンセルボタンを押してDLGを閉じる
-     */
-    closeDialog() {
-        this.count = 0;
-        this.isOpenBuyDlg = false;
-        this.isOpenUseDlg = false;
-        return
-    }
-
-    /**
-     * OKボタンを押してDLGを閉じる
-     */
-    closeDialogWithUpdate(mode: 'buy' | 'use') {
-        const targetId = this.listItem.id;
-        const responseBody: Partial<FoodStaffDetails> = {
-            staffCount: (mode === 'buy') ? Number(this.count) + this.listItem.staffCount : this.listItem.staffCount - Number(this.count)
+        /**
+         * DLG上のOKボタンが押せる状態かどうかをチェック
+         */
+        const canClickOkButton = () => {
+            if(dialogState.isOpenBuy) {
+                // 「買ったよ！」DLGでは負数の入力は許容しない
+                return dialogState.count < 0;
+            } else {
+                // 「使ったよ！」DLGでは負数の入力 および 保存量以上の使用量は許容しない
+                return dialogState.count < 0 || dialogState.count > props.listItem.staffCount;
+            }
         };
 
-        if(responseBody.staffCount === 0) {
-            // 食材を使った結果残りが0になった場合は、DELETEを投げる
-            deleteById(targetId).then(response => {
+        /**
+         * 引数で指定された分だけ買った個数を増やす
+         */
+        const addBuyCount = (value: number) => {
+            dialogState.count = Number(dialogState.count) + value;
+        };
+
+        /**
+         * 「全部使った」、「半分使った」が押された場合に使った個数を増やす
+         */
+        const addUseCount = (value: 'all' | 'half') => {
+            dialogState.count = (value === 'all') ? dialogState.count = props.listItem.staffCount : dialogState.count = (props.listItem.staffCount / 2);
+        };
+
+        /**
+         * キャンセルボタンを押してDLGを閉じる
+         */
+        const closeDialog = () => {
+            dialogState.count = 0;
+            dialogState.isOpenBuy = false;
+            dialogState.isOpenUse = false;
+            return
+        };
+
+        /**
+         * OKボタンを押してDLGを閉じる
+         */
+        const closeDialogWithUpdate = (mode: 'buy' | 'use') => {
+            const targetId = props.listItem.id;
+            const responseBody: Partial<FoodStaffDetails> = {
+                staffCount: (mode === 'buy') ?
+                    Number(dialogState.count) + props.listItem.staffCount : props.listItem.staffCount - Number(dialogState.count)
+            };
+
+            if(responseBody.staffCount === 0) {
+                // 食材を使った結果残りが0になった場合は、DELETEを投げる
+                deleteById(targetId).then(response => {
+                    if(response.status === 200) {
+                        location.reload();
+                    }
+                });
+                return;
+            }
+            // 基本的にはPUTを投げる
+            updateById(targetId, responseBody).then(response => {
                 if(response.status === 200) {
                     location.reload();
                 }
             });
-            return;
+        };
+        return {
+            ...toRefs(dialogState),
+            isInputMinus,
+            isResultMinus,
+            canClickOkButton,
+            addBuyCount,
+            addUseCount,
+            closeDialog,
+            closeDialogWithUpdate
         }
-        // 基本的にはPUTを投げる
-        updateById(targetId, responseBody).then(response => {
-            if(response.status === 200) {
-                location.reload();
-            }
-        });
     }
-
-    onClick() {
-    }
-
-}
+});
 </script>
-
 <style scoped>
 @import url('https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@100;300;400;500;700;800;900&display=swap');
 
@@ -281,17 +292,18 @@ export default class FoodStaffListItem extends Vue {
     width: 150px;
 }
 .list_count {
-    width: 100px;
+    width: 150px;
 }
 .list_action {
-    width: 200px;
+    width: 150px;
     display: flex;
-    justify-content: space-evenly;
+    justify-content: space-between;
 }
 .list_action_button {
     color: #FFFFFF;
     font-size: 14px;
     font-weight: 700;
+    margin: 0 2px;
 }
 
 .dialog-title {

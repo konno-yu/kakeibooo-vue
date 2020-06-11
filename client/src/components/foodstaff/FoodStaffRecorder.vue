@@ -9,12 +9,11 @@
                 </div>
                 <div class="food_staff_list" style="overflow: scroll;">
                     <FoodStaffList :listItems="fridgeTop">
-                        <template slot-scope="{listItems, onclick}">
+                        <template slot-scope="{listItems}">
                         <FoodStaffListItem
-                            v-for="(listItem, index) in fridgeTop"
+                            v-for="(listItem, index) in listItems"
                             :key="index"
                             :listItem="listItem"
-                            @click="onclick"
                         />
                         </template>
                     </FoodStaffList>
@@ -28,7 +27,7 @@
                 </div>
                 <div class="food_staff_list" style="overflow: scroll;">
                     <div class="small_category_tab">
-                        <KakeiboooTab :tabItems="tabItems" v-model="value">
+                        <KakeiboooTab :tabItems="tabItems" v-model="selectedTab">
                             <template slot-scope="{ tabItems, onTabChange, value }">
                             <KakeiboooTabItem
                                 v-for="(tabItem, index) in tabItems"
@@ -42,12 +41,11 @@
                     </div>
                     <div class="food_staff_list_with_tab">
                         <FoodStaffList :listItems="fridgeBottom">
-                            <template slot-scope="{listItems, onclick}">
+                            <template slot-scope="{listItems}">
                             <FoodStaffListItem
-                                v-for="(listItem, index) in fridgeBottom"
+                                v-for="(listItem, index) in listItems"
                                 :key="index"
                                 :listItem="listItem"
-                                @click="onclick"
                             />
                             </template>
                         </FoodStaffList>
@@ -64,12 +62,11 @@
                     </div>
                     <div class="food_staff_list" style="overflow: scroll;">
                         <FoodStaffList :listItems="seasoning">
-                            <template slot-scope="{listItems, onclick}">
+                            <template slot-scope="{listItems}">
                             <FoodStaffListItem
-                                v-for="(listItem, index) in seasoning"
+                                v-for="(listItem, index) in listItems"
                                 :key="index"
                                 :listItem="listItem"
-                                @click="onclick"
                             />
                             </template>
                         </FoodStaffList>
@@ -83,12 +80,11 @@
                     </div>
                     <div class="food_staff_list" style="overflow:scroll;">
                         <FoodStaffList :listItems="preserved">
-                            <template slot-scope="{listItems, onclick}">
+                            <template slot-scope="{listItems}">
                             <FoodStaffListItem
-                                v-for="(listItem, index) in preserved"
+                                v-for="(listItem, index) in listItems"
                                 :key="index"
                                 :listItem="listItem"
-                                @click="onclick"
                             />
                             </template>
                         </FoodStaffList>
@@ -100,7 +96,7 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop } from 'vue-property-decorator';
+import { defineComponent, ref, reactive, onMounted, toRefs } from '@vue/composition-api';
 import FoodStaffList from '@/components/foodstaff/FoodStaffList.vue';
 import FoodStaffListItem from '@/components/foodstaff/FoodStaffListItem.vue';
 import KakeiboooTab from '@/components/common/KakeiboooTab.vue';
@@ -110,65 +106,85 @@ import axios from 'axios';
 
 import { getAll } from '../../apis/foodStaffApi';
 
-@Component({
+type TabItem = {
+    label: FoodStaffSubCategoryLabel,
+    icon: string
+};
+type FoodStaffs = {
+    all: FoodStaffDetails[],
+    fridgeTop: FoodStaffDetails[],
+    fridgeBottom: FoodStaffDetails[],
+    seasoning: FoodStaffDetails[],
+    preserved: FoodStaffDetails[]
+};
+
+export default defineComponent({
     components: {
         FoodStaffList,
         FoodStaffListItem,
         KakeiboooTab,
         KakeiboooTabItem
-    }
-})
-export default class FoodStaffRecorder extends Vue {
-    private value: FoodStaffSubCategoryLabel = '野菜';
-
-    private tabItems: {label: FoodStaffSubCategoryLabel, icon: string}[] = [
-        {label: '野菜', icon: 'mdi-corn'},
-        {label: '残りもの', icon: 'mdi-diamond-stone'},
-        {label: 'その他', icon: 'mdi-flower'}
-    ];
-
-    private fridgeTop: FoodStaffDetails[] = [];
-    private fridgeBottom: FoodStaffDetails[] = [];
-    private seasoning: FoodStaffDetails[] = [];
-    private preserved: FoodStaffDetails[] = [];
-
-    private foodStaffs: FoodStaffDetails[] = [];
-
-    private subCategoryMap: {[key: string]: FoodStaffSubCategory} = {
-        '野菜': 'vegetables',
-        '残りもの': 'leftovers',
-        'その他': 'others'
-    }
-
-    /**
-     * 冷蔵庫のカテゴリ名をDBに格納する値に変換する
-     */
-    convertCategoryNameToValue(): FoodStaffSubCategory {
-         return this.subCategoryMap[this.value];
-    }
-
-    mounted() {
-        // データベースに登録された食材を画面に表示する
-        getAll().then(response => {
-            this.foodStaffs = response.data;
-            this.fridgeTop = this.foodStaffs.filter(staff => staff.category === 'fridge-top');
-            this.fridgeBottom = this.foodStaffs.filter(staff => staff.category === 'fridge-bottom' && staff.subCategory === this.convertCategoryNameToValue());
-            this.seasoning = this.foodStaffs.filter(staff => staff.category === 'seasoning');
-            this.preserved = this.foodStaffs.filter(staff => staff.category === 'preserved');
+    },
+    setup() {
+        const tabState = reactive<{selectedTab: FoodStaffSubCategoryLabel}>({
+            selectedTab: '残りもの'
         });
-    }
+        const tabItems = reactive<TabItem[]>([
+            {label: '野菜', icon: 'mdi-corn'},
+            {label: '残りもの', icon: 'mdi-diamond-stone'},
+            {label: 'その他', icon: 'mdi-flower'}
+        ]);
+        const subCategoryMap = reactive<{[key: string]: FoodStaffSubCategory}>({
+            '野菜': 'vegetables',
+            '残りもの': 'leftovers',
+            'その他': 'others'
+        });
+        const foodStaffs = reactive<FoodStaffs>({
+            all: [],
+            fridgeTop: [],
+            fridgeBottom: [],
+            seasoning: [],
+            preserved: []
+        });
 
-    /**
-     * 選択中のタブを切り替え
-     */
-    ontabchange(selected: FoodStaffSubCategoryLabel) {
-        this.value = selected;
-        this.fridgeBottom = this.foodStaffs.filter(staff => staff.subCategory === this.convertCategoryNameToValue());
-    }
+        /**
+         * 冷蔵庫内の保存場所の名前を値に変換する
+         */
+        const convertCategoryNameToValue = (): FoodStaffSubCategory => {
+            return subCategoryMap[tabState.selectedTab];
+        }
 
-    onclick(seleced: string) {
+        /**
+         * 選択中のタブを切り替える
+         */
+        const ontabchange = (selected: FoodStaffSubCategoryLabel) => {
+            tabState.selectedTab = selected;
+            foodStaffs.fridgeBottom = foodStaffs.all.filter(staff => staff.subCategory === convertCategoryNameToValue());
+        }
+
+        /**
+         * SVから食材一覧を取得して保存場所ごとに振り分ける
+         */
+        onMounted(() => {
+            getAll().then(response => {
+                foodStaffs.all = response.data;
+                foodStaffs.fridgeTop = foodStaffs.all.filter(staff => staff.category === 'fridge-top');
+                foodStaffs.fridgeBottom = foodStaffs.all.filter(staff => staff.category === 'fridge-bottom' && staff.subCategory === convertCategoryNameToValue());
+                foodStaffs.seasoning = foodStaffs.all.filter(staff => staff.category === 'seasoning');
+                foodStaffs.preserved = foodStaffs.all.filter(staff => staff.category === 'preserved');
+            })
+        });
+        return {
+            ...toRefs(tabState),
+            tabItems,
+            subCategoryMap,
+            ...toRefs(foodStaffs),
+            convertCategoryNameToValue,
+            ontabchange,
+            onMounted
+        }
     }
-}
+});
 </script>
 
 <style scoped>

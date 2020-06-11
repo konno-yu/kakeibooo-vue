@@ -5,43 +5,55 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop, Emit } from 'vue-property-decorator';
-
+import { defineComponent, computed } from '@vue/composition-api';
 import KakeiboooTabItem from '@/components/common/KakeiboooTabItem.vue';
-import { AppbarTabCategory } from '../../consts';
+import { AppbarTabCategory, FoodStaffSubCategoryLabel } from '../../consts';
 
-@Component({
+type TabItem = {
+    label: string,
+    icon: string
+}
+
+type Props = {
+    tabItems: TabItem[],
+    value: AppbarTabCategory;
+}
+
+export default defineComponent({
     components: {
         KakeiboooTabItem
-    }
-})
-export default class KakeiboooTab extends Vue {
-    // 全てのタブ要素
-    @Prop({required: true, default: []})
-    private tabItems!: {label: AppbarTabCategory, icon: string}[];
-    // 選択中のタブのラベル名
-    @Prop({required: true, default: ''})
-    private value!: AppbarTabCategory;
+    },
+    props: {
+        tabItems: {
+            type: Array as () => TabItem[],
+            required: true
+        },
+        value: {
+            type: String as () => AppbarTabCategory,
+            required: true
+        }
+    },
+    setup(props: Props, context) {
+        const slotProps = computed(() => {
+            return {
+                tabItems: props.tabItems,
+                value: props.value,
+                ontabchange: ontabchange
+            }
+        });
 
-    /**
-     * 親要素（KakeiboooAppBar）から送られてくるpropsを取得
-     * */
-    get slotProps() {
+        /**
+         * 選択中のタブを切り替え
+         */
+        const ontabchange = (selected: AppbarTabCategory) => {
+            context.emit('change', selected);
+        };
         return {
-            tabItems: this.$props.tabItems,
-            value: this.$props.value,
-            ontabchange: this.ontabchange
+            slotProps,
+            ontabchange
         }
     }
-
-    /**
-     * 選択中のタブを切り替え
-     * 親要素に切り替え後のタブラベルを伝搬させる
-     */
-    ontabchange(selected: AppbarTabCategory) {
-        this.$emit('change', selected);
-    }
-}
+});
 </script>
 
 <style scoped>
