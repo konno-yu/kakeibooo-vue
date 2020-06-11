@@ -16,7 +16,7 @@
                             style="color: 'white"
                             item-color="yellow accent-4"
                             v-model="unit"
-                            :items="items"
+                            :items="unitList"
                             color="#E0E0E0"
                             dense
                             outlined
@@ -48,7 +48,7 @@
             </div>
             <!-- 登録ボタン -->
             <div id="register_food_staff">
-                <v-btn color="#FFD600" elevation="0" width="100%" height="50" @click="post">
+                <v-btn color="#FFD600" elevation="0" width="100%" height="50" @click="postRequest">
                     <div id="register_button_label">食材を登録!</div>
                 </v-btn>
             </div>
@@ -57,54 +57,74 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop} from 'vue-property-decorator';
-
+import { defineComponent, reactive, toRefs } from '@vue/composition-api';
 import { FoodCountUnit, FoodStaffCategory, FoodStaffSubCategory, FoodStaffDetails } from '../../consts';
 import { post } from '../../apis/foodStaffApi';
 
-@Component({})
-export default class FoodStaffRegister extends Vue {
-    private staffName: string = '';
-    private staffCount: number | string = '';
-    private unit: FoodCountUnit = '個';
-    private items: FoodCountUnit[] = ['個', '本', '袋', '束', '缶', 'g', 'ml'];
-    private largeClassSelection: number = 0;
-    private smallClassSelection: number = 0;
+type StaffInfo = {
+    staffName: string,
+    staffCount: number | string,
+    unit: FoodCountUnit,
+    unitList: FoodCountUnit[],
+    largeClassSelection: number,
+    smallClassSelection: number
+};
 
-    private largetClassMap: FoodStaffCategory[] = ['fridge-top', 'fridge-bottom', 'seasoning', 'preserved'];
-    private smallClassMap: FoodStaffSubCategory[] = ['vegetables', 'leftovers', 'others'];
+export default defineComponent({
+    setup() {
+        const registeredContent = reactive<StaffInfo>({
+            staffName: '',
+            staffCount: '',
+            unit: '個',
+            unitList: ['個', '本', '袋', '束', '缶', 'g', 'ml'],
+            largeClassSelection: 0,
+            smallClassSelection: 0
+        });
+        const largeClassMap = reactive<FoodStaffCategory[]>(['fridge-top', 'fridge-bottom', 'seasoning', 'preserved']);
+        const smallClassMap = reactive<FoodStaffSubCategory[]>(['vegetables', 'leftovers', 'others']);
 
-    /**
-     * 保存場所の通し番号を値に変換する
-     */
-    convertSelectionToCategory(): FoodStaffCategory {
-        return this.largetClassMap[this.largeClassSelection];
-    };
-
-    /**
-     * 冷蔵庫内の保存場所の通し番号を値に変換する
-     */
-    convertSelectionToSubCategory(): FoodStaffSubCategory | null {
-        // 冷蔵庫以外はnullを返しておく
-        return (this.largeClassSelection !== 1) ? null : this.smallClassMap[this.smallClassSelection];
-    }
-
-    post() {
-        const requestBody: FoodStaffDetails = {
-            id: 0,
-            staffName: this.staffName,
-            staffCount: +this.staffCount,
-            unit: this.unit,
-            category: this.convertSelectionToCategory(),
-            subCategory: this.convertSelectionToSubCategory()
+        /**
+         * 保存先の選択位置を値に変換する
+         */
+        const convertSelectionToCategory = (): FoodStaffCategory => {
+            return largeClassMap[registeredContent.largeClassSelection];
         };
-        post(requestBody).then(response => {
-            // TODO 正常時の分岐もあったほうがよい
-            // TODO エラー処理も後々必要になりそう
-            location.reload();
-        })
+
+        /**
+         * 冷蔵庫内の保存先の選択位置を値に変換する
+         */
+        const convertSelectionToSubCategory = (): FoodStaffSubCategory | null => {
+            return (registeredContent.largeClassSelection !== 1) ? null : smallClassMap[registeredContent.smallClassSelection];
+        };
+
+        /**
+         * 入力された食材情報をSVに対して投げる
+         */
+        const postRequest = () => {
+            const requestBody: FoodStaffDetails = {
+                id: 0,
+                staffName: registeredContent.staffName,
+                staffCount: +registeredContent.staffCount,
+                unit: registeredContent.unit,
+                category: convertSelectionToCategory(),
+                subCategory: convertSelectionToSubCategory()
+            };
+            post(requestBody).then(response => {
+                // TODO 正常時の分岐もあったほうがよい
+                // TODO エラー処理も後々必要になりそう
+                location.reload();
+            });
+        };
+        return {
+            ...toRefs(registeredContent),
+            largeClassMap,
+            smallClassMap,
+            convertSelectionToCategory,
+            convertSelectionToSubCategory,
+            postRequest
+        }
     }
-}
+})
 </script>
 
 <style scoped>
