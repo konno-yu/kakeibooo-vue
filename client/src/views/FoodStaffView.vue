@@ -14,19 +14,16 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component } from 'vue-property-decorator';
-
+import { defineComponent } from '@vue/composition-api';
 import FoodStaffRegister from '@/components/foodstaff/FoodStaffRegister.vue';
 import FoodStaffRecorder from '@/components/foodstaff/FoodStaffRecorder.vue';
 
-@Component({
+export default defineComponent({
     components: {
         FoodStaffRegister,
-        FoodStaffRecorder,
+        FoodStaffRecorder
     }
 })
-export default class FoodStaffView extends Vue {
-}
 </script>
 
 <style scoped>
