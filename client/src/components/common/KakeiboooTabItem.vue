@@ -15,26 +15,39 @@
     </v-btn>
 </template>
 <script lang="ts">
-import { Vue, Component, Prop, Emit } from 'vue-property-decorator';
-import { AppbarTabCategory } from '../../consts';
+import { defineComponent } from '@vue/composition-api';
+import { AppbarTabCategory, FoodStaffSubCategoryLabel } from '../../consts';
 
-@Component({})
-export default class KakeiboooTabItem extends Vue {
-    // 描画対象のタブ要素
-    @Prop({required: true, default: {}})
-    tabItem!: {label: AppbarTabCategory, icon: string};
-    // 対象のタブ要素が選択中がどうか
-    @Prop({type: Boolean, required: true})
-    isSelected!: boolean;
-
-    /**
-     * 選択中のタブを切り替え
-     * 親要素（KakeiboooTab）にタブラベルを伝搬させる
-     */
-    tabClick() {
-        this.$emit("change", this.tabItem.label);
-    }
+type TabItem = {
+    label: AppbarTabCategory | FoodStaffSubCategoryLabel,
+    icon: string
 }
+
+type Props = {
+    tabItem: TabItem,
+    isSelected: boolean
+}
+
+export default defineComponent({
+    props: {
+        tabItem: {
+            type: Object as () => TabItem,
+            required: true
+        },
+        isSelected: {
+            type: Boolean,
+            required: true
+        }
+    },
+    setup(props: Props, context) {
+        const tabClick = () => {
+            context.emit('change', props.tabItem.label);
+        };
+        return {
+            tabClick
+        }
+    }
+})
 </script>
 
 <style scoped>
