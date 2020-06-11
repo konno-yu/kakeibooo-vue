@@ -3,11 +3,11 @@
         <!-- サービスタイトル部分 -->
         <div class="title_area">
             <v-icon large color="#FFD600">mdi-reddit</v-icon>
-            <div class="app_title">{{headerElement.appTitle}}</div>
+            <div class="app_title">{{appTitle}}</div>
         </div>
         <!-- メニュータブ部分 -->
         <div class="tab_area">
-            <KakeiboooTab :tabItems="tabItems" v-model="headerElement.selectedTab">
+            <KakeiboooTab :tabItems="tabItems" v-model="selectedTab">
                 <template slot-scope="{ tabItems, onTabChange, value }">
                 <KakeiboooTabItem
                     v-for="(tabItem, index) in tabItems"
@@ -22,14 +22,13 @@
         <!-- ユーザアカウント部分 -->
         <div class="account_area">
            <v-avatar width="40" height="40"><img src="@/assets/user_account.png"></v-avatar>
-           <div class="avatar_name">{{headerElement.userName}}のおサイフ</div>
+           <div class="avatar_name">{{userName}}のおサイフ</div>
         </div>
     </div>
 </template>
 
 <script lang="ts">
-// import { Vue, Component, Prop } from 'vue-property-decorator';
-import { defineComponent, reactive } from '@vue/composition-api';
+import { defineComponent, reactive, ref, toRefs } from '@vue/composition-api';
 import KakeiboooTab from '@/components/common/KakeiboooTab.vue';
 import KakeiboooTabItem from '@/components/common/KakeiboooTabItem.vue';
 import { AppbarTabCategory } from '../../consts';
@@ -40,30 +39,41 @@ type HeaderElement = {
     selectedTab: AppbarTabCategory
 };
 
+type TabItem = {
+    label: AppbarTabCategory,
+    icon: string
+}
+
 export default defineComponent({
     components: {
         KakeiboooTab,
         KakeiboooTabItem
     },
 
-    setup(props, ctx) {
+    setup(props) {
         const headerElement = reactive<HeaderElement>({
             appTitle: 'KaKeiBooo',
             userName: 'コンノ',
             selectedTab: '家計簿'
         });
-        const tabItems: {label: AppbarTabCategory, icon: string}[] = [
+
+        const tabItems = reactive<TabItem[]>([
         {label: '家計簿', icon: 'mdi-square-edit-outline'},
         {label: '食費管理', icon: 'mdi-cart'},
         {label: '食材管理', icon: 'mdi-one-up'}
-        ];
+        ]);
 
+        /**
+         * 選択中のタブを切り替え
+         */
         const ontabchange = (selected: AppbarTabCategory) => {
             headerElement.selectedTab = selected;
         }
 
         return {
-            headerElement, tabItems, ontabchange
+            ...toRefs(headerElement),
+            tabItems,
+            ontabchange
         }
     }
 })
