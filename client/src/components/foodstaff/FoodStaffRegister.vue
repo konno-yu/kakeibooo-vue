@@ -61,7 +61,7 @@ import { defineComponent, reactive, toRefs } from '@vue/composition-api';
 import { FoodCountUnit, FoodStaffCategory, FoodStaffSubCategory, FoodStaffDetails } from '../../consts';
 import { post } from '../../apis/foodStaffApi';
 
-type StaffInfo = {
+type FoodStaffType = {
     staffName: string,
     staffCount: number | string,
     unit: FoodCountUnit,
@@ -72,7 +72,7 @@ type StaffInfo = {
 
 export default defineComponent({
     setup() {
-        const registeredContent = reactive<StaffInfo>({
+        const foodStaffState = reactive<FoodStaffType>({
             staffName: '',
             staffCount: '',
             unit: '個',
@@ -87,14 +87,14 @@ export default defineComponent({
          * 保存先の選択位置を値に変換する
          */
         const convertSelectionToCategory = (): FoodStaffCategory => {
-            return largeClassMap[registeredContent.largeClassSelection];
+            return largeClassMap[foodStaffState.largeClassSelection];
         };
 
         /**
          * 冷蔵庫内の保存先の選択位置を値に変換する
          */
         const convertSelectionToSubCategory = (): FoodStaffSubCategory | null => {
-            return (registeredContent.largeClassSelection !== 1) ? null : smallClassMap[registeredContent.smallClassSelection];
+            return (foodStaffState.largeClassSelection !== 1) ? null : smallClassMap[foodStaffState.smallClassSelection];
         };
 
         /**
@@ -103,9 +103,9 @@ export default defineComponent({
         const postRequest = () => {
             const requestBody: FoodStaffDetails = {
                 id: 0,
-                staffName: registeredContent.staffName,
-                staffCount: +registeredContent.staffCount,
-                unit: registeredContent.unit,
+                staffName: foodStaffState.staffName,
+                staffCount: +foodStaffState.staffCount,
+                unit: foodStaffState.unit,
                 category: convertSelectionToCategory(),
                 subCategory: convertSelectionToSubCategory()
             };
@@ -116,7 +116,7 @@ export default defineComponent({
             });
         };
         return {
-            ...toRefs(registeredContent),
+            ...toRefs(foodStaffState),
             largeClassMap,
             smallClassMap,
             convertSelectionToCategory,
