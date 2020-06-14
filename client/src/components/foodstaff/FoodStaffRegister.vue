@@ -76,7 +76,7 @@
 <script lang="ts">
 import { defineComponent, reactive, toRefs } from '@vue/composition-api';
 import { FoodCountUnit, FoodStaffCategory, FoodStaffSubCategory, FoodStaffDetails } from '../../consts';
-import { post } from '../../apis/foodStaffApi';
+import { post, getAll } from '../../apis/foodStaffApi';
 
 type FoodStaffType = {
     staffName: string,
@@ -145,10 +145,20 @@ export default defineComponent({
                 category: convertSelectionToCategory(),
                 subCategory: convertSelectionToSubCategory()
             };
-            post(requestBody).then(response => {
-                // TODO 正常時の分岐もあったほうがよい
-                // TODO エラー処理も後々必要になりそう
-                location.reload();
+            getAll().then(response => {
+                const isDuplicate = (response.data as FoodStaffDetails[]).filter(staff => staff.staffName === foodStaffState.staffName).length > 0;
+                if(isDuplicate) {
+                    snackbarState.isErrorOpen = true;
+                    snackbarState.snackbarMessage = "すでに登録されています";
+                    return;
+                }
+            })
+            .then(() => {
+                post(requestBody).then(response => {
+                    snackbarState.isSuccessOpen = true;
+                    snackbarState.snackbarMessage = "登録が完了しました";
+                    setTimeout(() => location.reload(), 1000);
+                });
             });
         };
         return {
