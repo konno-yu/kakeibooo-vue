@@ -132,6 +132,11 @@ export default defineComponent({
          * 入力された食材情報をSVに対して投げる
          */
         const postRequest = () => {
+            if(foodStaffState.staffName === "" || foodStaffState.staffCount === "") {
+                snackbarState.isErrorOpen = true;
+                snackbarState.snackbarMessage = "入力内容に不備があります";
+                return;
+            }
             const requestBody: FoodStaffDetails = {
                 id: 0,
                 staffName: foodStaffState.staffName,
