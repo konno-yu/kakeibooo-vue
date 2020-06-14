@@ -87,6 +87,14 @@ type FoodStaffType = {
     smallClassSelection: number
 };
 
+type SnackbarType = {
+    isSuccessOpen: boolean,
+    isErrorOpen: boolean,
+    snackbarMessage: SnackbarMessageType
+}
+
+type SnackbarMessageType = '' | '入力内容に不備があります' | 'すでに登録されています' | '登録が完了しました';
+
 export default defineComponent({
     setup() {
         const foodStaffState = reactive<FoodStaffType>({
@@ -97,6 +105,12 @@ export default defineComponent({
             largeClassSelection: 0,
             smallClassSelection: 0
         });
+        const snackbarState = reactive<SnackbarType>({
+            isSuccessOpen: false,
+            isErrorOpen: false,
+            snackbarMessage: ''
+        });
+
         const largeClassMap = reactive<FoodStaffCategory[]>(['fridge-top', 'fridge-bottom', 'seasoning', 'preserved']);
         const smallClassMap = reactive<FoodStaffSubCategory[]>(['vegetables', 'leftovers', 'others']);
 
@@ -134,6 +148,7 @@ export default defineComponent({
         };
         return {
             ...toRefs(foodStaffState),
+            ...toRefs(snackbarState),
             largeClassMap,
             smallClassMap,
             convertSelectionToCategory,
