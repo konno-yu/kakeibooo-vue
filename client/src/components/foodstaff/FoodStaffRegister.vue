@@ -53,15 +53,32 @@
                 </v-btn>
             </div>
         </div>
+
+        <!-- 登録成功時のsnackbar -->
+        <v-snackbar class="snackbar" v-model="isSuccessOpen" timeout="2000" right color="#42A5F5">
+            <div style="display:flex;align-items:center">
+                <v-icon color="white">mdi-emoticon-happy-outline</v-icon>
+                <div style="font-weight:700;margin-left:5px">{{snackbarMessage}}</div>
+            </div>
+            <v-btn icon color="#FFFFFF" @click="closeSnackbar"><v-icon>mdi-window-close</v-icon></v-btn>
+        </v-snackbar>
+        <!-- 登録失敗時のsnackbar -->
+        <v-snackbar class="snackbar" v-model="isErrorOpen" timeout="2000" right color="#EF5350">
+            <div style="display:flex;align-items:center">
+                <v-icon color="white">mdi-emoticon-cry-outline</v-icon>
+                <div style="font-weight:700;margin-left:5px">{{snackbarMessage}}</div>
+            </div>
+            <v-btn icon color="#FFFFFF" @click="closeSnackbar"><v-icon>mdi-window-close</v-icon></v-btn>
+        </v-snackbar>
     </v-app>
 </template>
 
 <script lang="ts">
 import { defineComponent, reactive, toRefs } from '@vue/composition-api';
 import { FoodCountUnit, FoodStaffCategory, FoodStaffSubCategory, FoodStaffDetails } from '../../consts';
-import { post } from '../../apis/foodStaffApi';
+import { post, getAll } from '../../apis/foodStaffApi';
 
-type StaffInfo = {
+type FoodStaffType = {
     staffName: string,
     staffCount: number | string,
     unit: FoodCountUnit,
@@ -70,9 +87,17 @@ type StaffInfo = {
     smallClassSelection: number
 };
 
+type SnackbarType = {
+    isSuccessOpen: boolean,
+    isErrorOpen: boolean,
+    snackbarMessage: SnackbarMessageType
+}
+
+type SnackbarMessageType = '' | '入力内容に不備があります' | 'すでに登録されています' | '登録が完了しました';
+
 export default defineComponent({
     setup() {
-        const registeredContent = reactive<StaffInfo>({
+        const foodStaffState = reactive<FoodStaffType>({
             staffName: '',
             staffCount: '',
             unit: '個',
@@ -80,6 +105,12 @@ export default defineComponent({
             largeClassSelection: 0,
             smallClassSelection: 0
         });
+        const snackbarState = reactive<SnackbarType>({
+            isSuccessOpen: false,
+            isErrorOpen: false,
+            snackbarMessage: ''
+        });
+
         const largeClassMap = reactive<FoodStaffCategory[]>(['fridge-top', 'fridge-bottom', 'seasoning', 'preserved']);
         const smallClassMap = reactive<FoodStaffSubCategory[]>(['vegetables', 'leftovers', 'others']);
 
@@ -87,36 +118,58 @@ export default defineComponent({
          * 保存先の選択位置を値に変換する
          */
         const convertSelectionToCategory = (): FoodStaffCategory => {
-            return largeClassMap[registeredContent.largeClassSelection];
+            return largeClassMap[foodStaffState.largeClassSelection];
         };
 
         /**
          * 冷蔵庫内の保存先の選択位置を値に変換する
          */
         const convertSelectionToSubCategory = (): FoodStaffSubCategory | null => {
-            return (registeredContent.largeClassSelection !== 1) ? null : smallClassMap[registeredContent.smallClassSelection];
+            return (foodStaffState.largeClassSelection !== 1) ? null : smallClassMap[foodStaffState.smallClassSelection];
+        };
+
+        const closeSnackbar = () => {
+            snackbarState.isSuccessOpen = false;
+            snackbarState.isErrorOpen = false;
+            snackbarState.snackbarMessage = '';
         };
 
         /**
          * 入力された食材情報をSVに対して投げる
          */
         const postRequest = () => {
+            if(foodStaffState.staffName === "" || foodStaffState.staffCount === "") {
+                snackbarState.isErrorOpen = true;
+                snackbarState.snackbarMessage = "入力内容に不備があります";
+                return;
+            }
             const requestBody: FoodStaffDetails = {
                 id: 0,
-                staffName: registeredContent.staffName,
-                staffCount: +registeredContent.staffCount,
-                unit: registeredContent.unit,
+                staffName: foodStaffState.staffName,
+                staffCount: +foodStaffState.staffCount,
+                unit: foodStaffState.unit,
                 category: convertSelectionToCategory(),
                 subCategory: convertSelectionToSubCategory()
             };
-            post(requestBody).then(response => {
-                // TODO 正常時の分岐もあったほうがよい
-                // TODO エラー処理も後々必要になりそう
-                location.reload();
+            getAll().then(response => {
+                const isDuplicate = (response.data as FoodStaffDetails[]).filter(staff => staff.staffName === foodStaffState.staffName).length > 0;
+                if(isDuplicate) {
+                    snackbarState.isErrorOpen = true;
+                    snackbarState.snackbarMessage = "すでに登録されています";
+                    return;
+                }
+            })
+            .then(() => {
+                post(requestBody).then(response => {
+                    snackbarState.isSuccessOpen = true;
+                    snackbarState.snackbarMessage = "登録が完了しました";
+                    setTimeout(() => location.reload(), 1000);
+                });
             });
         };
         return {
-            ...toRefs(registeredContent),
+            ...toRefs(foodStaffState),
+            ...toRefs(snackbarState),
             largeClassMap,
             smallClassMap,
             convertSelectionToCategory,
@@ -131,6 +184,10 @@ export default defineComponent({
 @import url('https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@100;300;400;500;700;800;900&display=swap');
 
 .food_staff_register {
+    font-family: 'M PLUS Rounded 1c', sans-serif;
+}
+
+.snackbar {
     font-family: 'M PLUS Rounded 1c', sans-serif;
 }
 
