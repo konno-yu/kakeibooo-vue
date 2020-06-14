@@ -53,6 +53,23 @@
                 </v-btn>
             </div>
         </div>
+
+        <!-- 登録成功時のsnackbar -->
+        <v-snackbar class="snackbar" v-model="isSuccessOpen" timeout="3000" right color="#42A5F5">
+            <div style="display:flex;align-items:center">
+                <v-icon color="white">mdi-emoticon-happy-outline</v-icon>
+                <div style="font-weight:700;margin-left:5px">{{snackbarMessage}}</div>
+            </div>
+            <v-btn icon color="#FFFFFF" @click="isSuccessOpen=false"><v-icon>mdi-window-close</v-icon></v-btn>
+        </v-snackbar>
+        <!-- 登録失敗時のsnackbar -->
+        <v-snackbar class="snackbar" v-model="isErrorOpen" timeout="3000" right color="#EF5350">
+            <div style="display:flex;align-items:center">
+                <v-icon color="white">mdi-emoticon-cry-outline</v-icon>
+                <div style="font-weight:700;margin-left:5px">{{snackbarMessage}}</div>
+            </div>
+            <v-btn icon color="#FFFFFF" @click="isErrorOpen=false"><v-icon>mdi-window-close</v-icon></v-btn>
+        </v-snackbar>
     </v-app>
 </template>
 
@@ -131,6 +148,10 @@ export default defineComponent({
 @import url('https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@100;300;400;500;700;800;900&display=swap');
 
 .food_staff_register {
+    font-family: 'M PLUS Rounded 1c', sans-serif;
+}
+
+.snackbar {
     font-family: 'M PLUS Rounded 1c', sans-serif;
 }
 
