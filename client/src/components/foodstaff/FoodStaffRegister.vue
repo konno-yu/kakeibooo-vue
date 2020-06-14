@@ -55,20 +55,20 @@
         </div>
 
         <!-- 登録成功時のsnackbar -->
-        <v-snackbar class="snackbar" v-model="isSuccessOpen" timeout="3000" right color="#42A5F5">
+        <v-snackbar class="snackbar" v-model="isSuccessOpen" timeout="2000" right color="#42A5F5">
             <div style="display:flex;align-items:center">
                 <v-icon color="white">mdi-emoticon-happy-outline</v-icon>
                 <div style="font-weight:700;margin-left:5px">{{snackbarMessage}}</div>
             </div>
-            <v-btn icon color="#FFFFFF" @click="isSuccessOpen=false"><v-icon>mdi-window-close</v-icon></v-btn>
+            <v-btn icon color="#FFFFFF" @click="closeSnackbar"><v-icon>mdi-window-close</v-icon></v-btn>
         </v-snackbar>
         <!-- 登録失敗時のsnackbar -->
-        <v-snackbar class="snackbar" v-model="isErrorOpen" timeout="3000" right color="#EF5350">
+        <v-snackbar class="snackbar" v-model="isErrorOpen" timeout="2000" right color="#EF5350">
             <div style="display:flex;align-items:center">
                 <v-icon color="white">mdi-emoticon-cry-outline</v-icon>
                 <div style="font-weight:700;margin-left:5px">{{snackbarMessage}}</div>
             </div>
-            <v-btn icon color="#FFFFFF" @click="isErrorOpen=false"><v-icon>mdi-window-close</v-icon></v-btn>
+            <v-btn icon color="#FFFFFF" @click="closeSnackbar"><v-icon>mdi-window-close</v-icon></v-btn>
         </v-snackbar>
     </v-app>
 </template>
@@ -126,6 +126,12 @@ export default defineComponent({
          */
         const convertSelectionToSubCategory = (): FoodStaffSubCategory | null => {
             return (foodStaffState.largeClassSelection !== 1) ? null : smallClassMap[foodStaffState.smallClassSelection];
+        };
+
+        const closeSnackbar = () => {
+            snackbarState.isSuccessOpen = false;
+            snackbarState.isErrorOpen = false;
+            snackbarState.snackbarMessage = '';
         };
 
         /**
