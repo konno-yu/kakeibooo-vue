@@ -7,15 +7,11 @@
 <script lang="ts">
 import { defineComponent, computed } from '@vue/composition-api';
 import KakeiboooTabItem from '@/components/common/KakeiboooTabItem.vue';
-import { AppbarTabCategory, FoodStaffSubCategoryLabel } from '../../consts';
+import { AppbarTabCategory, KakeiboooTabItemType } from '../../types/commonTypes';
+import { FoodStaffSubCategoryLabel } from '../../types/foodStaffTypes';
 
-type TabItem = {
-    label: string,
-    icon: string
-}
-
-type Props = {
-    tabItems: TabItem[],
+type KakeiboooTabProps = {
+    tabItems: KakeiboooTabItemType[],
     value: AppbarTabCategory;
 }
 
@@ -25,7 +21,7 @@ export default defineComponent({
     },
     props: {
         tabItems: {
-            type: Array as () => TabItem[],
+            type: Array as () => KakeiboooTabItemType[],
             required: true
         },
         value: {
@@ -33,7 +29,7 @@ export default defineComponent({
             required: true
         }
     },
-    setup(props: Props, context) {
+    setup(props: KakeiboooTabProps, context) {
         const slotProps = computed(() => {
             return {
                 tabItems: props.tabItems,
