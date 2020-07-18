@@ -1,37 +1,46 @@
 <template>
-    <div class="appbar_root">
-        <!-- サービスタイトル部分 -->
-        <div class="title_area">
-            <v-icon large color="#FFD600">mdi-reddit</v-icon>
-            <div class="app_title">{{appTitle}}</div>
+    <v-app>
+        <div class="appbar_root">
+            <!-- サービスタイトル部分 -->
+            <div class="title_area">
+                <v-icon large color="#FFD600">mdi-reddit</v-icon>
+                <div class="app_title">{{appTitle}}</div>
+            </div>
+            <!-- メニュータブ部分 -->
+            <div class="tab_area">
+                <KakeiboooTab :tabItems="tabItems" v-model="selectedTab">
+                    <template slot-scope="{ tabItems, onTabChange, value }">
+                    <KakeiboooTabItem
+                        v-for="(tabItem, index) in tabItems"
+                        :key="index"
+                        :tabItem="tabItem"
+                        :isSelected="value === tabItem.label"
+                        @change="ontabchange"
+                    />
+                    </template>
+                </KakeiboooTab>
+            </div>
+            <!-- ユーザアカウント部分 -->
+            <div class="account_area">
+            <v-avatar width="40" height="40"><img src="@/assets/user_account.png"></v-avatar>
+            <div class="avatar_name">{{userName}}のおサイフ</div>
+            </div>
         </div>
-        <!-- メニュータブ部分 -->
-        <div class="tab_area">
-            <KakeiboooTab :tabItems="tabItems" v-model="selectedTab">
-                <template slot-scope="{ tabItems, onTabChange, value }">
-                <KakeiboooTabItem
-                    v-for="(tabItem, index) in tabItems"
-                    :key="index"
-                    :tabItem="tabItem"
-                    :isSelected="value === tabItem.label"
-                    @change="ontabchange"
-                />
-                </template>
-            </KakeiboooTab>
+        <div>
+            <ExpensesView v-show="selectedTab === '家計簿'"/>
+            <!-- <ExpensesView v-show="selectedTab === '食費管理'"/> -->
+            <FoodStaffView v-show="selectedTab === '食材管理'"/>
         </div>
-        <!-- ユーザアカウント部分 -->
-        <div class="account_area">
-           <v-avatar width="40" height="40"><img src="@/assets/user_account.png"></v-avatar>
-           <div class="avatar_name">{{userName}}のおサイフ</div>
-        </div>
-    </div>
+    </v-app>
 </template>
 
 <script lang="ts">
 import { defineComponent, reactive, ref, toRefs } from '@vue/composition-api';
 import KakeiboooTab from '@/components/common/KakeiboooTab.vue';
 import KakeiboooTabItem from '@/components/common/KakeiboooTabItem.vue';
-import { AppbarTabCategory } from '../../consts';
+import { AppbarTabCategory } from '../../types/commonTypes';
+import FoodStaffView from '@/views/FoodStaffView.vue';
+import ExpensesView from '@/views/ExpensesView.vue';
 
 type HeaderElement = {
     appTitle: string,
@@ -47,7 +56,9 @@ type TabItem = {
 export default defineComponent({
     components: {
         KakeiboooTab,
-        KakeiboooTabItem
+        KakeiboooTabItem,
+        FoodStaffView,
+        ExpensesView
     },
 
     setup(props) {
@@ -80,7 +91,9 @@ export default defineComponent({
 </script>
 
 <style scoped>
+@import url('https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@100;300;400;500;700;800;900&display=swap');
 .appbar_root {
+    font-family: 'M PLUS Rounded 1c', sans-serif;
     height: 70px;
     width: 100%;
     background: #FFFFFF;

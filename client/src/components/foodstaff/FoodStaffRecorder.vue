@@ -101,7 +101,7 @@ import FoodStaffList from '@/components/foodstaff/FoodStaffList.vue';
 import FoodStaffListItem from '@/components/foodstaff/FoodStaffListItem.vue';
 import KakeiboooTab from '@/components/common/KakeiboooTab.vue';
 import KakeiboooTabItem from '@/components/common/KakeiboooTabItem.vue';
-import {FoodStaffSubCategoryLabel, FoodStaffSubCategory, FoodStaffDetails } from '../../consts';
+import {FoodStaffSubCategoryLabel, FoodStaffSubCategory, FoodStaff } from '../../types/foodStaffTypes';
 import axios from 'axios';
 
 import { getAll } from '../../apis/foodStaffApi';
@@ -111,11 +111,11 @@ type TabItem = {
     icon: string
 };
 type FoodStaffs = {
-    all: FoodStaffDetails[],
-    fridgeTop: FoodStaffDetails[],
-    fridgeBottom: FoodStaffDetails[],
-    seasoning: FoodStaffDetails[],
-    preserved: FoodStaffDetails[]
+    all: FoodStaff[],
+    fridgeTop: FoodStaff[],
+    fridgeBottom: FoodStaff[],
+    seasoning: FoodStaff[],
+    preserved: FoodStaff[]
 };
 
 export default defineComponent({

@@ -170,27 +170,29 @@
 
 <script lang="ts">
 import { defineComponent, reactive, ref, toRefs } from '@vue/composition-api';
-import { FoodStaffDetails } from '../../consts';
+import { FoodStaff, FoodStaffDialogState, FoodStaffConsumption, FoodStaffDialogType } from '../../types/foodStaffTypes';
 import { updateById, deleteById } from '../../apis/foodStaffApi';
+
+import { FOODSTAFF } from '../../messages/foodStaffMessages';
 
 export default defineComponent({
     props: {
         listItem: {
-            type: Object as () => FoodStaffDetails,
+            type: Object as () => FoodStaff,
             required: true
         }
     },
     setup(props) {
-        const dialogState = reactive<{isOpenBuy: boolean, isOpenUse: boolean, count: number}>({
+        const dialogState = reactive<FoodStaffDialogState>({
             isOpenBuy: false,
             isOpenUse: false,
             count: 0
         });
 
         // テキストFに負の値が入力されたときのエラーメッセージ
-        const isInputMinus = (value: number) => value >= 0 || '正の値を入力してください';
+        const isInputMinus = (value: number) => value >= 0 || FOODSTAFF.ERROR_WITH_MINUS_INPUT;
         // テキストFに入力された値によって保存量がマイナスになったときのエラーメッセージ
-        const isResultMinus = (value: number) => value <= props.listItem.staffCount || '使った量が保存量を超えます';
+        const isResultMinus = (value: number) => value <= props.listItem.staffCount || FOODSTAFF.ERROR_WITH_OVER_USAGE;
 
         /**
          * DLG上のOKボタンが押せる状態かどうかをチェック
@@ -215,7 +217,7 @@ export default defineComponent({
         /**
          * 「全部使った」、「半分使った」が押された場合に使った個数を増やす
          */
-        const addUseCount = (value: 'all' | 'half') => {
+        const addUseCount = (value: FoodStaffConsumption) => {
             dialogState.count = (value === 'all') ? dialogState.count = props.listItem.staffCount : dialogState.count = (props.listItem.staffCount / 2);
         };
 
@@ -232,9 +234,9 @@ export default defineComponent({
         /**
          * OKボタンを押してDLGを閉じる
          */
-        const closeDialogWithUpdate = (mode: 'buy' | 'use') => {
+        const closeDialogWithUpdate = (mode: FoodStaffDialogType) => {
             const targetId = props.listItem.id;
-            const responseBody: Partial<FoodStaffDetails> = {
+            const responseBody: Partial<FoodStaff> = {
                 staffCount: (mode === 'buy') ?
                     Number(dialogState.count) + props.listItem.staffCount : props.listItem.staffCount - Number(dialogState.count)
             };

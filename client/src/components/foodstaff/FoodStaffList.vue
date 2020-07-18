@@ -7,10 +7,10 @@
 <script lang="ts">
 import { defineComponent, computed } from '@vue/composition-api';
 import FoodStaffListItem from '@/components/foodstaff/FoodStaffListItem.vue';
-import { FoodStaffDetails } from '../../consts';
+import { FoodStaff } from '../../types/foodStaffTypes';
 
 type Props = {
-    listItems: FoodStaffDetails[]
+    listItems: FoodStaff[]
 }
 
 export default defineComponent({
@@ -19,7 +19,7 @@ export default defineComponent({
     },
     props: {
         listItems: {
-            type: Array as () => FoodStaffDetails[],
+            type: Array as () => FoodStaff[],
             required: true
         }
     },

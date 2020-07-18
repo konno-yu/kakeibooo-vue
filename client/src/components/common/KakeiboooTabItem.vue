@@ -16,14 +16,15 @@
 </template>
 <script lang="ts">
 import { defineComponent } from '@vue/composition-api';
-import { AppbarTabCategory, FoodStaffSubCategoryLabel } from '../../consts';
+import { AppbarTabCategory } from '../../types/commonTypes';
+import { FoodStaffSubCategoryLabel } from '../../types/foodStaffTypes';
 
 type TabItem = {
     label: AppbarTabCategory | FoodStaffSubCategoryLabel,
     icon: string
 }
 
-type Props = {
+type KakeiboooTabItemProps = {
     tabItem: TabItem,
     isSelected: boolean
 }
@@ -39,7 +40,7 @@ export default defineComponent({
             required: true
         }
     },
-    setup(props: Props, context) {
+    setup(props: KakeiboooTabItemProps, context) {
         const tabClick = () => {
             context.emit('change', props.tabItem.label);
         };
