@@ -26,7 +26,7 @@
 PostgreSQLをインストールし、次のコマンドを入力してデータベースを作成します.
 
 ```SQL
-CREATE DATABATE kakeibooo;
+CREATE DATABASE kakeibooo;
 ```
 
 ### 3. kakeiboooの起動

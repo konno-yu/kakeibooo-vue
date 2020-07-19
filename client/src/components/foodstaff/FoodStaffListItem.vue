@@ -218,7 +218,7 @@ export default defineComponent({
          * 「全部使った」、「半分使った」が押された場合に使った個数を増やす
          */
         const addUseCount = (value: FoodStaffConsumption) => {
-            dialogState.count = (value === 'all') ? dialogState.count = props.listItem.staffCount : dialogState.count = (props.listItem.staffCount / 2);
+            dialogState.count = (value === 'all') ? dialogState.count = props.listItem.staffCount : dialogState.count = Math.round(props.listItem.staffCount / 2);
         };
 
         /**
