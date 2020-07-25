@@ -1,6 +1,6 @@
 <template>
-    <div class="kakeibooo_tab">
-        <slot v-bind="slotProps" />
+    <div class="kakeibooo-tab">
+        <slot v-bind="slotProps"/>
     </div>
 </template>
 
@@ -38,12 +38,10 @@ export default defineComponent({
             }
         });
 
-        /**
-         * 選択中のタブを切り替え
-         */
-        const ontabchange = (selected: AppbarTabCategory) => {
+        function ontabchange(selected: AppbarTabCategory) {
             context.emit('change', selected);
         };
+
         return {
             slotProps,
             ontabchange
@@ -53,7 +51,7 @@ export default defineComponent({
 </script>
 
 <style scoped>
-.kakeibooo_tab {
+.kakeibooo-tab {
     width: 100%;
     height: 100%;
 }
