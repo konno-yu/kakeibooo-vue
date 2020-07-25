@@ -1,17 +1,17 @@
 <template>
   <div class="root">
-    <KakeiboooAppBar/>
+    <KakeiboooAppbar/>
     <!-- いまはappbarの中で画面下半分を描画しているが、本当はrouterとか使ってここでやるべき -->
   </div>
 </template>
 
 <script lang="ts">
 import { defineComponent } from '@vue/composition-api';
-import KakeiboooAppBar from '@/components/appbar/KakeiboooAppBar.vue';
+import KakeiboooAppbar from '@/components/appbar/KakeiboooAppbar.vue';
 
 export default defineComponent({
   components: {
-    KakeiboooAppBar,
+    KakeiboooAppbar,
   }
 });
 </script>
