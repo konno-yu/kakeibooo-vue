@@ -1,28 +1,27 @@
 <template>
     <v-btn
         :ripple="{ class: 'white--text' }"
-        :class="{ 'active-tab': isSelected }"
+        :class="{'active_tab': isSelected}"
         @click="tabClick"
-        width="120"
+        width="33%"
         height="100%"
         elevation="0"
-        tile
-        text
+        tile text
     >
-        <div :class="{ 'active_category': isSelected }" class="tab-category">
+        <div :class="{'active_category': isSelected}" class="tab_category">
+            <v-icon class="tab_icon">{{tabItem.icon}}</v-icon>
             {{tabItem.label}}
         </div>
     </v-btn>
 </template>
-
 <script lang="ts">
 import { defineComponent } from '@vue/composition-api';
 import { AppbarTabCategory } from '../../types/commonTypes';
-import { FoodStaffSubCategoryLabel } from '../../types/foodStaffTypes'
+import { FoodStaffSubCategoryLabel } from '../../types/foodStaffTypes';
 
 type TabItem = {
     label: AppbarTabCategory | FoodStaffSubCategoryLabel,
-    icon?: string
+    icon: string
 }
 
 type KakeiboooTabItemProps = {
@@ -31,7 +30,7 @@ type KakeiboooTabItemProps = {
 }
 
 export default defineComponent({
-props: {
+    props: {
         tabItem: {
             type: Object as () => TabItem,
             required: true
@@ -49,18 +48,27 @@ props: {
             tabClick
         }
     }
-});
+})
 </script>
 
 <style scoped>
-.tab-category {
-    color: #333333;
+.tab_item {
+    width: 30%;
+    border-bottom: 3px solid #FFFFFF;
+}
+.tab_category {
+    color: #616161;
     font-weight: 700;
     font-size: 18px;
     display: flex;
 }
-
-.active-tab {
-    border-bottom: 3px solid #333333 !important;
+.tab_icon {
+    margin-right: 5px;
+}
+.active_tab {
+    border-bottom: 3px solid #FFD600 !important;
+}
+.active_category {
+    color: #FFD600;
 }
 </style>

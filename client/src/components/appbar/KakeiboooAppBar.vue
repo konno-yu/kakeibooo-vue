@@ -1,147 +1,141 @@
 <template>
     <v-app>
-        <div class="appbar_root">
-            <!-- サービスタイトル部分 -->
-            <div class="title_area">
-                <v-icon large color="#FFD600">mdi-reddit</v-icon>
-                <div class="app_title">{{appTitle}}</div>
+        <div class="appbar-root">
+            <div class="title-area">
+                <v-icon color="#333333">mdi-cart</v-icon>
+                <div class="app-title">Kakeibooo</div>
             </div>
-            <!-- メニュータブ部分 -->
-            <div class="tab_area">
-                <KakeiboooTab :tabItems="tabItems" v-model="selectedTab">
+            <div class="tab-area">
+                <kakeiboooTab :tabItems="tabItems" v-model="selectedTab">
                     <template slot-scope="{ tabItems, onTabChange, value }">
-                    <KakeiboooTabItem
-                        v-for="(tabItem, index) in tabItems"
-                        :key="index"
-                        :tabItem="tabItem"
-                        :isSelected="value === tabItem.label"
-                        @change="ontabchange"
-                    />
+                        <kakeiboooTabItem
+                          v-for="(tabItem, index) in tabItems"
+                          :key="index"
+                          :tabItem="tabItem"
+                          :isSelected="value === tabItem.label"
+                          @change="ontabchange"
+                        />
                     </template>
-                </KakeiboooTab>
+                </kakeiboooTab>
             </div>
-            <!-- ユーザアカウント部分 -->
-            <div class="account_area">
-            <v-avatar width="40" height="40"><img src="@/assets/user_account.png"></v-avatar>
-            <div class="avatar_name">{{userName}}のおサイフ</div>
+            <div class="account-area">
+                <v-btn color="#333333" icon><v-icon>mdi-bell</v-icon></v-btn>
+                <div class="account-avatar">
+                    <v-avatar width="30" height="30">
+                        <img src="@/assets/fox.svg">
+                    </v-avatar>
+                </div>
             </div>
         </div>
         <div>
             <ExpensesView v-show="selectedTab === '家計簿'"/>
             <!-- <ExpensesView v-show="selectedTab === '食費管理'"/> -->
-            <FoodStaffView v-show="selectedTab === '食材管理'"/>
+            <FoodStaffView v-show="selectedTab === '食材'"/>
         </div>
     </v-app>
 </template>
 
 <script lang="ts">
-import { defineComponent, reactive, ref, toRefs } from '@vue/composition-api';
+import { defineComponent, reactive, toRefs } from '@vue/composition-api';
 import KakeiboooTab from '@/components/common/KakeiboooTab.vue';
 import KakeiboooTabItem from '@/components/common/KakeiboooTabItem.vue';
 import { AppbarTabCategory } from '../../types/commonTypes';
 import FoodStaffView from '@/views/FoodStaffView.vue';
 import ExpensesView from '@/views/ExpensesView.vue';
 
-type HeaderElement = {
+type HeaderType = {
     appTitle: string,
-    userName: string,
     selectedTab: AppbarTabCategory
 };
 
-type TabItem = {
-    label: AppbarTabCategory,
-    icon: string
-}
+type TabItemType = {
+    label: AppbarTabCategory
+};
 
 export default defineComponent({
     components: {
         KakeiboooTab,
         KakeiboooTabItem,
-        FoodStaffView,
-        ExpensesView
+        ExpensesView,
+        FoodStaffView
     },
 
-    setup(props) {
-        const headerElement = reactive<HeaderElement>({
-            appTitle: 'KaKeiBooo',
-            userName: 'コンノ',
-            selectedTab: '家計簿'
+    setup() {
+        const headerItem = reactive<HeaderType>({
+            appTitle: "Kakeibooo",
+            selectedTab: "家計簿"
         });
-
-        const tabItems = reactive<TabItem[]>([
-        {label: '家計簿', icon: 'mdi-square-edit-outline'},
-        {label: '食費管理', icon: 'mdi-cart'},
-        {label: '食材管理', icon: 'mdi-one-up'}
+        const tabItems = reactive<TabItemType[]>([
+            { label: "家計簿" },
+            { label: "食費" },
+            { label: "食材" }
         ]);
 
-        /**
-         * 選択中のタブを切り替え
-         */
-        const ontabchange = (selected: AppbarTabCategory) => {
-            headerElement.selectedTab = selected;
+        function ontabchange(selected: AppbarTabCategory) {
+            headerItem.selectedTab = selected;
         }
 
         return {
-            ...toRefs(headerElement),
+            ...toRefs(headerItem),
             tabItems,
             ontabchange
         }
     }
-})
+});
 </script>
 
 <style scoped>
 @import url('https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@100;300;400;500;700;800;900&display=swap');
-.appbar_root {
+.appbar-root {
     font-family: 'M PLUS Rounded 1c', sans-serif;
-    height: 70px;
+    height: 60px;
     width: 100%;
-    background: #FFFFFF;
+    background: #F7D65A;
     display: flex;
     justify-content: space-around;
     align-items: center;
 }
-.title_area {
-    width: 300px;
+
+.title-area {
+    width: 15%;
     height: 100%;
+    padding: 10px;
     display: flex;
+    justify-content: center;
     align-items: center;
 }
-.title_icon {
-    height: 40px;
+
+.app-title {
+    color: #333333;
+    font-weight: 800;
+    font-size: 24px;
+}
+
+.tab-area {
+    width: 65%;
+    height: 100%;
+    padding: 10px 20px 10px 20px;
+    display: flex;
+    align-items: center;
+    border-left: 2px dashed #333333;
+}
+
+.account-area {
+    width: 20%;
+    height: 100%;
+    padding: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: space-evenly;
+}
+
+.account-avatar {
     width: 40px;
-}
-.app_title {
-    color: #FFD600;
-    font-weight: 900;
-    font-size: 28px;
-    margin-left: 5px;
-}
-.tab_area {
-    width: 650px;
-    height: 100%;
-    padding: 10px;
+    height: 40px;
+    border-radius: 80px;
+    background: #333333;
     display: flex;
-    align-items: center;
-}
-.account_area {
-    width: 250px;
-    height: 100%;
-    padding: 10px;
-    display: flex;
-    align-items: center;
-}
-.avatar_name {
-    margin-left: 5px;
-    font-size: 18px;
-    font-weight: 700;
-    color: #616161;
-}
-.tab_area {
-    width: 650px;
-    height: 100%;
-    padding: 10px;
-    display: flex;
+    justify-content: center;
     align-items: center;
 }
 </style>

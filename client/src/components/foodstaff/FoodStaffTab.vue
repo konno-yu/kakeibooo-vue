@@ -1,12 +1,12 @@
 <template>
-    <div class="kakeibooo-tab">
-        <slot v-bind="slotProps"/>
+    <div class="kakeibooo_tab">
+        <slot v-bind="slotProps" />
     </div>
 </template>
 
 <script lang="ts">
 import { defineComponent, computed } from '@vue/composition-api';
-import KakeiboooTabItem from '@/components/common/KakeiboooTabItem.vue';
+import FoodStaffTabItem from '@/components/foodstaff/FoodStaffTabItem.vue';
 import { AppbarTabCategory, KakeiboooTabItemType } from '../../types/commonTypes';
 import { FoodStaffSubCategoryLabel } from '../../types/foodStaffTypes';
 
@@ -17,7 +17,7 @@ type KakeiboooTabProps = {
 
 export default defineComponent({
     components: {
-        KakeiboooTabItem
+        FoodStaffTabItem
     },
     props: {
         tabItems: {
@@ -38,10 +38,12 @@ export default defineComponent({
             }
         });
 
-        function ontabchange(selected: AppbarTabCategory) {
+        /**
+         * 選択中のタブを切り替え
+         */
+        const ontabchange = (selected: AppbarTabCategory) => {
             context.emit('change', selected);
         };
-
         return {
             slotProps,
             ontabchange
@@ -51,7 +53,7 @@ export default defineComponent({
 </script>
 
 <style scoped>
-.kakeibooo-tab {
+.kakeibooo_tab {
     width: 100%;
     height: 100%;
 }

@@ -27,9 +27,9 @@
                 </div>
                 <div class="food_staff_list" style="overflow: scroll;">
                     <div class="small_category_tab">
-                        <KakeiboooTab :tabItems="tabItems" v-model="selectedTab">
+                        <FoodStaffTab :tabItems="tabItems" v-model="selectedTab">
                             <template slot-scope="{ tabItems, onTabChange, value }">
-                            <KakeiboooTabItem
+                            <FoodStaffTabItem
                                 v-for="(tabItem, index) in tabItems"
                                 :key="index"
                                 :tabItem="tabItem"
@@ -37,7 +37,7 @@
                                 @change="ontabchange"
                             />
                             </template>
-                        </KakeiboooTab>
+                        </FoodStaffTab>
                     </div>
                     <div class="food_staff_list_with_tab">
                         <FoodStaffList :listItems="fridgeBottom">
@@ -99,8 +99,8 @@
 import { defineComponent, ref, reactive, onMounted, toRefs } from '@vue/composition-api';
 import FoodStaffList from '@/components/foodstaff/FoodStaffList.vue';
 import FoodStaffListItem from '@/components/foodstaff/FoodStaffListItem.vue';
-import KakeiboooTab from '@/components/common/KakeiboooTab.vue';
-import KakeiboooTabItem from '@/components/common/KakeiboooTabItem.vue';
+import FoodStaffTab from '@/components/foodstaff/FoodStaffTab.vue';
+import FoodStaffTabItem from '@/components/foodstaff/FoodStaffTabItem.vue';
 import {FoodStaffSubCategoryLabel, FoodStaffSubCategory, FoodStaff } from '../../types/foodStaffTypes';
 import axios from 'axios';
 
@@ -122,8 +122,8 @@ export default defineComponent({
     components: {
         FoodStaffList,
         FoodStaffListItem,
-        KakeiboooTab,
-        KakeiboooTabItem
+        FoodStaffTab,
+        FoodStaffTabItem
     },
     setup() {
         const tabState = reactive<{selectedTab: FoodStaffSubCategoryLabel}>({
