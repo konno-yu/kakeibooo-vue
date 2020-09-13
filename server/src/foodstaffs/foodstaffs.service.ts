@@ -1,37 +1,37 @@
 import { Injectable, Get, Post, Put, Delete } from '@nestjs/common';
 import { Repository } from 'typeorm';
-import { Foodstaff } from './foodStaff.entity';
+import { Foodstaffs } from './foodstaffs.entity';
 import { InjectRepository } from '@nestjs/typeorm';
-import { FoodstaffDto } from './foodstaff.dto';
+import { FoodstaffsDto } from './foodstaffs.dto';
 
 @Injectable()
 export class FoodstaffsService {
     constructor(
-        @InjectRepository(Foodstaff) private foodstaffRepository: Repository<Foodstaff>
+        @InjectRepository(Foodstaffs) private foodstaffsRepository: Repository<Foodstaffs>
     ){}
 
     async getAll() {
-        return await this.foodstaffRepository.find({order: {id: 'DESC'}});
+        return await this.foodstaffsRepository.find({order: {id: 'DESC'}});
     }
 
     async getById(id: number) {
-        return await this.foodstaffRepository.findOne({where: {id: id}});
+        return await this.foodstaffsRepository.findOne({where: {id: id}});
     }
 
-    async post(data: FoodstaffDto) {
-        const staff = this.foodstaffRepository.create(data);
+    async post(data: FoodstaffsDto) {
+        const staff = this.foodstaffsRepository.create(data);
         staff.inputDate = new Date();
-        await this.foodstaffRepository.save(staff);
+        await this.foodstaffsRepository.save(staff);
         return staff;
     }
 
-    async update(id: number, data: Partial<FoodstaffDto>) {
-        await this.foodstaffRepository.update({id}, data);
-        return this.foodstaffRepository.findOne({where: {id: id}});
+    async update(id: number, data: Partial<FoodstaffsDto>) {
+        await this.foodstaffsRepository.update({id}, data);
+        return this.foodstaffsRepository.findOne({where: {id: id}});
     }
 
     async delete(id: number) {
-        await this.foodstaffRepository.delete({id});
+        await this.foodstaffsRepository.delete({id});
         return { deleted: true };
     }
 

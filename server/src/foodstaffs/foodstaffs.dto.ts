@@ -1,4 +1,4 @@
-export interface FoodstaffDto {
+export interface FoodstaffsDto {
     id: number;
     staffName: string;
     staffCount: number;
