@@ -1,5 +1,6 @@
 import { reactive } from '@vue/composition-api';
 import moment from 'moment';
+import { GetReceipt } from '@/types/receiptType';
 
 type ExpensesStoreProps = {
   month: number,
@@ -7,6 +8,8 @@ type ExpensesStoreProps = {
   dayExpenses: number,
   displayedMonth?: number,
   monthlyExpenses: DayExpenses[][],
+  //
+  receipts: Receipt[]
 }
 
 type DayExpenses = {
@@ -14,14 +17,23 @@ type DayExpenses = {
   cost: number | null
 };
 
+export type Receipt = {
+  id?: number,
+  purchaseDate: Date,
+  store: string,
+  expense: number
+}
+
+
 export default function expensesStore() {
   const state = reactive<ExpensesStoreProps>({
     // momentjsのmonthは実際より1小さい値を利用しているので+1しておく
-    month: moment().month() + 1,
-    date: moment().date(),
+    month: new Date().getMonth() + 1,//moment().month() + 1,
+    date: new Date().getDate(),//moment().date(),
     dayExpenses: 0,
     displayedMonth: moment().month() + 1,
     monthlyExpenses: [...Array(6)].map(week => Array(7).fill({date: null, cost: null})),
+    receipts: [],
   });
 
   return {
@@ -41,6 +53,9 @@ export default function expensesStore() {
     get monthlyExpenses() {
       return state.monthlyExpenses;
     },
+    get receipts() {
+      return state.receipts;
+    },
 
     // setter
     setMonth(month: number) {
@@ -58,6 +73,9 @@ export default function expensesStore() {
     setMonthlyExpenses(monthlyExpenses: DayExpenses[][]) {
       state.monthlyExpenses = monthlyExpenses;
     },
+    setReceipts(receipts: Receipt[]) {
+      state.receipts = receipts;
+    }
   };
 }
 
