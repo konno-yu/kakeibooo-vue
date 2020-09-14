@@ -32,8 +32,8 @@
                 >
                     <div style="display:flex;flex-direction:column;">
                         <div :class="[(index === 0 || index === 6) ? index === 0 ? 'label-sunday' : 'label-saturday' : 'label-weekday']">{{ day.date }}</div>
-                        <div class="cost" v-show="day.cost !== null">¥{{ day.cost }}</div>
-                        <div style="height:30px;" v-show="day.date !== null && day.cost === null"></div>
+                        <div class="cost" v-show="day.date !== null">¥{{ day.expense }}</div>
+                        <div style="height:30px;" v-show="day.date === null && day.expense === 0"></div>
                     </div>
                 </div>
             </div>
@@ -42,12 +42,14 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, reactive, onMounted, toRefs, inject, computed } from '@vue/composition-api';
+import { defineComponent, reactive, onMounted, toRefs, inject, computed, watch } from '@vue/composition-api';
 import moment from 'moment';
-import { getAll, getByMonth } from '../../apis/expensesApi';
+import { getByMonth } from '../../apis/expensesApi';
+import * as ReceiptApi from '../../apis/receiptApi';
 import ExpensesKey from './expenses-key';
 import { ExpensesStore } from '../../store/expenses';
 import { DailyExpenses, Expenses } from '../../types/expensesTypes';
+import { ReceiptsController } from '../../../../server/dist/receipts/receipts.controller';
 
 export default defineComponent({
     setup() {
@@ -64,40 +66,67 @@ export default defineComponent({
 
         const calendarHeader = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
+
+        watch(() => [expensesStore.receipts], (newStore) => {
+            buildCalendarBody();
+        })
         const displayPrevMonth = () => {
             const prevMonth  = (month.value - 1) > 0 ? month.value - 1 : 12;
             expensesStore.setMonth(prevMonth);
-            expensesStore.setDate(1);
-            expensesStore.setDayExpenses(0);
-            getByMonth(month.value).then((response) => buildCalendarBody(response.data as Expenses[]));
+            // expensesStore.setDate(1);
+            // expensesStore.setDayExpenses(0);
+            ReceiptApi.getByMonth(month.value).then(() => buildCalendarBody());
+            // buildCalendarBody();
+            // getByMonth(month.value).then((response) => buildCalendarBody(response.data as Expenses[]));
         };
         const displayNextMonth = () => {
             const nextMonth = (month.value + 1) > 12 ? 1 : month.value + 1;
             expensesStore.setMonth(nextMonth);
-            expensesStore.setDate(1);
-            expensesStore.setDayExpenses(0);
-            getByMonth(month.value).then((response) => buildCalendarBody(response.data as Expenses[]));
+            // expensesStore.setDate(1);
+            // expensesStore.setDayExpenses(0);
+            ReceiptApi.getByMonth(month.value).then(() => buildCalendarBody());
+            // buildCalendarBody();
+            // getByMonth(month.value).then((resbuildCalendarBody();ponse) => buildCalendarBody(response.data as Expenses[]));
         }
 
-        const buildCalendarBody = (data: Expenses[]) => {
-            const targetMonth = moment().month(expensesStore.month - 1);
-            const endOf = targetMonth.endOf("month").date();
+        const buildCalendarBody = (data?: Expenses[]) => {
+            const targetMonth = month.value;
+            const thisYear = new Date().getFullYear();
+            // 月は0始まりなので1引いておく
+            const endOf = new Date(thisYear, targetMonth, 0).getDate();
+
             let weekIndex = 0;
-
-            const updatedMonthlyExpenses = [...Array(6)].map(week => Array(7).fill({date: null, cost: null}));
-
-            [...Array(endOf).keys()].map((_, i) => i + 1).forEach((date) => {
-                // 探す日をdateとして、対応するデータがあるか探す
-                const correspondingData = data.find(d => moment(d.targetDate).date() === date);
-                const targetDay = correspondingData
-                ? moment(correspondingData.targetDate).day()
-                : moment(moment().year(2020).month(expensesStore.month - 1).date(date)).day();
-                updatedMonthlyExpenses[weekIndex].splice(targetDay, 1, {date: date, cost: correspondingData ? correspondingData.cost : null});
-                if(targetDay === 6) {
+            const receipts = expensesStore.receipts;
+            const monthlyExpenses = [...Array(6)].map(week => Array(7).fill({ date: null, expense: 0 }));
+            // const receipts = expensesStore.receipts;
+            [...Array(endOf).keys()].map((_, i) => i + 1).forEach(day => {
+                const targetDayReceipts = receipts.filter(receipt => { new Date(receipt.purchaseDate).getDate() === day});
+                // 月は0始まりなので1引いておく
+                const date = new Date(thisYear, targetMonth - 1, day).getDay();
+                const expense = receipts.filter(receipt => new Date(receipt.purchaseDate).getDate() === day).reduce((sum, receipt) => sum + receipt.expense, 0);
+                monthlyExpenses[weekIndex].splice(date, 1, { date: day, expense: expense});
+                if(date === 6) {
                     weekIndex++;
                 }
             });
-            expensesStore.setMonthlyExpenses(updatedMonthlyExpenses);
+            // const targetMonth = moment().month(expensesStore.month - 1);
+            // const endOf = targetMonth.endOf("month").date();
+            // let weekIndex = 0;
+
+            // const updatedMonthlyExpenses = [...Array(6)].map(week => Array(7).fill({date: null, cost: null}));
+
+            // [...Array(endOf).keys()].map((_, i) => i + 1).forEach((date) => {
+            //     // 探す日をdateとして、対応するデータがあるか探す
+            //     const correspondingData = data.find(d => moment(d.targetDate).date() === date);
+            //     const targetDay = correspondingData
+            //     ? moment(correspondingData.targetDate).day()
+            //     : moment(moment().year(2020).month(expensesStore.month - 1).date(date)).day();
+            //     updatedMonthlyExpenses[weekIndex].splice(targetDay, 1, {date: date, cost: correspondingData ? correspondingData.cost : null});
+            //     if(targetDay === 6) {
+            //         weekIndex++;
+            //     }
+            // });
+            expensesStore.setMonthlyExpenses(monthlyExpenses);
         }
 
         const clickCalendarDate = (day: DailyExpenses) => {
@@ -111,11 +140,14 @@ export default defineComponent({
             }
         }
 
-        onMounted(() => {
-            getByMonth(expensesStore.month).then((response) => {
-                buildCalendarBody(response.data as Expenses[]);
-            });
-        });
+        // onMounted(() => {
+        //     console.log("cal");
+        //     buildCalendarBody();
+        // //     ReceiptApi.getAll().then(res => )
+        //     // getByMonth(expensesStore.month).then((response) => {
+        //     //     buildCalendarBody(response.data as Expenses[]);
+        //     // });
+        // });
 
         return {
             month,
@@ -124,7 +156,7 @@ export default defineComponent({
             calendarHeader,
             displayPrevMonth,
             displayNextMonth,
-            onMounted,
+            // onMounted,
             clickCalendarDate
         }
     }
@@ -142,6 +174,7 @@ export default defineComponent({
     display: flex;
     flex-direction: column;
     align-items: center;
+    padding: 10px;
 }
 
 .calendar-area-menu {
