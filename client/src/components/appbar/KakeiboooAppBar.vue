@@ -2,12 +2,12 @@
     <v-app>
         <div class="appbar-root">
             <div class="title-area">
-                <v-icon color="#333333">mdi-cart</v-icon>
+                <v-icon color="#333333">mdi-piggy-bank</v-icon>
                 <div class="app-title">Kakeibooo</div>
             </div>
             <div class="tab-area">
                 <kakeiboooTab :tabItems="tabItems" v-model="selectedTab">
-                    <template slot-scope="{ tabItems, onTabChange, value }">
+                    <template slot-scope="{ tabItems, ontabchange, value }">
                         <kakeiboooTabItem
                           v-for="(tabItem, index) in tabItems"
                           :key="index"
