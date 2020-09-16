@@ -56,7 +56,7 @@
         </div>
 
         <!-- 登録成功時のsnackbar -->
-        <v-snackbar class="snackbar" v-model="isOpen" timeout="2000" right>
+        <v-snackbar class="snackbar" v-model="isOpen" timeout="1500" right>
             <div style="display:flex;align-items:center">
                 <v-icon v-show="mode === 'success'" color="#FFD600">mdi-piggy-bank</v-icon>
                 <v-icon v-show="mode === 'error'" color="#FF8A80">mdi-comment-alert-outline</v-icon>
@@ -77,10 +77,9 @@ import { FoodStaffUnit } from '../../types/foodStaffTypes';
 import { Expenses, SnackbarState } from '../../types/expensesTypes';
 
 import * as ReceiptRest from '../../apis/receiptApi';
-import { GetReceipt, ReceiptSnackbarMessage, ReceiptSnackbarState } from '../../types/receiptType';
+import { GetReceipt, ReceiptSnackbarMessage, ReceiptSnackbarState, ValidationResult } from '../../types/receiptType';
 import Axios, { AxiosResponse } from 'axios';
 import { isUndefined } from 'util';
-import { error } from 'console';
 
 export default defineComponent({
     setup() {
@@ -107,25 +106,24 @@ export default defineComponent({
 
 
         // ライフサイクルメソッドの created() 相当
-        ReceiptRest.getByMonth(receiptDate.month).then(res => {
+        ReceiptRest.getByMonth(receiptDate.month).then((res: AxiosResponse<Receipt[]>) => {
             // todo 上と共通化できる
-            const receipts = (res as AxiosResponse<Receipt[]>).data;
-            receipts.forEach(receipt => receipt.purchaseDate = new Date(receipt.purchaseDate));
-            expensesStore.setReceipts(receipts);
+            const monthlyReceipts = res.data;
+            monthlyReceipts.forEach(receipt => receipt.purchaseDate = new Date(receipt.purchaseDate));
+            expensesStore.setReceipts(monthlyReceipts);
 
-            const h = expensesStore.receipts.filter(receipt => receipt.purchaseDate.getTime() === new Date().getTime());
-            h.forEach((h) => targetDayReceipt.push(h));
+            const dayReceipt = monthlyReceipts.filter(receipt => receipt.purchaseDate.getDate() === new Date().getDate());
+            dayReceipt.forEach((h) => targetDayReceipt.push(h));
         });
 
         watch(() => [expensesStore.month, expensesStore.date], (newStore) => {
-            targetDayReceipt .length = 0;  // 初期化
+            targetDayReceipt.splice(0, targetDayReceipt.length);
             if(receiptDate.month !== newStore[0]) {
                 // 月が変わった
-                receiptDate.month = newStore[0];
-                receiptDate.date = newStore[1];
+                [receiptDate.month, receiptDate.date] = newStore;
 
-                ReceiptRest.getByMonth(receiptDate.month).then(res => {
-                    const receipts = (res as AxiosResponse<Receipt[]>).data;
+                ReceiptRest.getByMonth(receiptDate.month).then((res: AxiosResponse<Receipt[]>) => {
+                    const receipts = res.data;
                     receipts.forEach(receipt => receipt.purchaseDate = new Date(receipt.purchaseDate));
                     expensesStore.setReceipts(receipts);
                     const targetDate = expensesStore.receipts.filter(receipt => receipt.purchaseDate.getDate() === receiptDate.date);
@@ -134,7 +132,7 @@ export default defineComponent({
                 return;
             }
             if(receiptDate.date !== newStore[1]) {
-                // 日が変わった時
+                // 日が変わった
                 receiptDate.date = newStore[1];
                 const newTargetReceipt = expensesStore.receipts.filter(r => new Date(r.purchaseDate).getDate() === newStore[1]);
                 newTargetReceipt.forEach(r => targetDayReceipt.push(r));
@@ -142,9 +140,17 @@ export default defineComponent({
             }
         });
 
-        const invalidInput = (): {isInvalid: boolean, message: ReceiptSnackbarMessage} => {
-            let result: {isInvalid: boolean, message: ReceiptSnackbarMessage} = {isInvalid: true, message: '' };
+        const invalidInput = (): ValidationResult => {
+            let result: ValidationResult = {isInvalid: true, message: '' };
+
+            const thisYear = new Date().getFullYear();
+            const endOf = new Date(thisYear, receiptDate.month, 0).getDate();
             targetDayReceipt.forEach(receipt => {
+                if(receiptDate.date < 1 || receiptDate.date >= endOf) {
+                    result.isInvalid = false;
+                    result.message = '無効な日付が指定されていませんか？';
+                    return;
+                }
                 if(receipt.store === '') {
                     result.isInvalid = false;
                     result.message = '未入力の店舗がありませんか？';
@@ -161,7 +167,7 @@ export default defineComponent({
                     return;
                 }
             });
-            if(targetDayReceipt.length !== _.uniqBy(targetDayReceipt, 'store').length) {
+            if(targetDayReceipt.filter(f => f.store !== '').length !== _.uniqBy(targetDayReceipt.filter(f => f.store !== ''), 'store').length) {
                 result.isInvalid = false;
                 result.message = '同じ店舗が複数登録されていませんか？';
             }
@@ -183,41 +189,50 @@ export default defineComponent({
             }
             loading.value = true;
 
-            const receipts: readonly Receipt[] = expensesStore.receipts;
+            const receipts: Receipt[] = expensesStore.receipts;
             const isPostAll = targetDayReceipt.filter(receipt => 'id' in receipt).length === 0;
             if(isPostAll) {
                 // ある日付に対して初めて食費を登録する
-                ReceiptRest.postAll(targetDayReceipt).then((res) => {
+                ReceiptRest.postAll(targetDayReceipt).then((res: AxiosResponse<Receipt[]>) => {
                     if(res.data) {
-                        targetDayReceipt.length = 0;
+                        targetDayReceipt.splice(0, targetDayReceipt.length);
                         // SV側でidが付与されるので、UI上の値にもidを反映する
-                        (res.data as Receipt[]).forEach(r => targetDayReceipt.push(r));
-                        expensesStore.setReceipts(receipts.concat(res.data));
+                        res.data.forEach(r => targetDayReceipt.push(r));
                     }
                     setTimeout(() => {
                         loading.value = false;
                         showSuccessSnackbar('登録が完了しました');
+                        expensesStore.setReceipts(receipts.concat(res.data));
                     }, 2000);
                     return;
                 });
             } else {
-                const restQueries: Promise<any>[] = [];
+                const restQueries: Promise<AxiosResponse<Receipt>>[] = [];
                 targetDayReceipt.forEach((receipt, i) => {
                     const isPut = 'id' in receipt;
                     restQueries.push(isPut ? ReceiptRest.update(receipt) : ReceiptRest.post(receipt));
                 });
                 if(restQueries.length > 0) {
                     Promise.all(restQueries).then(result => {
-                        targetDayReceipt.length = 0;
-                        const newData: any[] = [];
+                        targetDayReceipt.splice(0, targetDayReceipt.length);
+                        const newData: Receipt[] = [];
                         result.forEach(res => {
-                            targetDayReceipt.push(res.data as Receipt);
-                            if(res.config.method === "post") newData.push(res.data);
+                            targetDayReceipt.push(res.data);
+                            if(res.config.method === "post") {
+                                newData.push(res.data);
+                            } else {
+                                receipts.forEach(r => {
+                                    if(r.id === res.data.id) {
+                                        r.store = res.data.store;
+                                        r.expense = res.data.expense;
+                                    }
+                                });
+                            }
                         });
-                        expensesStore.setReceipts(receipts.concat(newData));
                         setTimeout(() => {
                             loading.value = false;
                             showSuccessSnackbar('更新が完了しました');
+                            expensesStore.setReceipts(receipts.concat(newData));
                         }, 2000);
                         return;
                     });
@@ -271,7 +286,7 @@ export default defineComponent({
         }
 
         const inputDate = (newDate: number) => {
-            targetDayReceipt.length = 0;
+            targetDayReceipt.splice(0, targetDayReceipt.length);
             expensesStore.receipts.forEach(receipt => {
                 if((receipt.purchaseDate.getMonth() + 1) === receiptDate.month && receipt.purchaseDate.getDate() === +newDate) {
                     targetDayReceipt.push(receipt);
@@ -282,17 +297,10 @@ export default defineComponent({
             }
         }
 
-        const closeSnackbar = () => {
-            snackbarState.isOpen = false;
-            snackbarState.mode = 'success';
-            snackbarState.message = '';
-        };
-
         return {
             ...toRefs(receiptDate),
             sendReceipt,
             ...toRefs(snackbarState),
-            closeSnackbar,
             targetDayReceipt,
             deleteItem,
             addItem,
