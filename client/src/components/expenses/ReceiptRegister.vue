@@ -1,53 +1,60 @@
 <template>
     <v-app>
-        <div class="expenses_register">
-            <div style='width:100%;height:50px;font-weight:700;font-size:24px;color:#F7D65A;display:flex;align-items:center;justify-content:center;padding-bottom:15px'>
-                コンノ家の食費
+        <div class="expenses-register">
+            <div class="register-label">
+                konno-yuの食費
             </div>
 
-            <div style='width:100%;height:50px;display:flex;align-items:end;justify-content:center;'>
+            <div class="date-register">
                 <div style="width:30%"><v-text-field class="input-date" v-model="month" outlined dense disabled/></div>
                 <span style="font-size:28px;width:10%;text-align:center">/</span>
                 <div style="width:30%"><v-text-field @input="(newDate) => inputDate(newDate)" class="input-date" v-model="date" outlined dense/></div>
             </div>
 
-            <div style="width:100%;height:1px;margin:20px 0;border-bottom:2px dashed #333333;"/>
+            <div class="divider"/>
 
             <div v-show="targetDayReceipt.length !== 0" style="height: 230px">
                 <!-- TODO v-modelと@changeの併用はよくないらしい -->
-                <div style="height:50px;display:flex;justify-content:space-around;align-items:baseline;margin:10px" v-for="(item, i) in targetDayReceipt" :key="i">
+                <div class="receipt-register" v-for="(item, i) in targetDayReceipt" :key="i">
                     <v-text-field @change="(newStore) => changeStore(newStore, i)" v-model="item.store" color="#333333" class="input-shop" style="width:50%;margin-right:10px;padding:0 !important;" prepend-inner-icon="mdi-store" />
                     <v-text-field @change="(newExpense) => changeExpense(newExpense, i)" v-model="item.expense" color="#333333" class="input-expense" style="width:30%;margin-left:10px;margin-right:10px;padding:0 !important" prepend-inner-icon="mdi-currency-jpy"/>
-                    <v-btn @click="deleteItem(item.id, i)" icon style="margin-left:10px"><v-icon>mdi-trash-can-outline</v-icon></v-btn>
+                    <v-btn @click="deleteReceipt(item.id, i)" icon style="margin-left:10px"><v-icon>mdi-trash-can-outline</v-icon></v-btn>
                 </div>
             </div>
 
-                <div v-show="date !== '' && !isNaN(date) && targetDayReceipt.length === 0" style="height: 230px;display:flex;justify-content:space-around;margin:10px;flex-direction:column">
+                <div v-show="date !== '' && !isNaN(date) && targetDayReceipt.length === 0" class="register-guide">
                     <div style="font-size: 14px;color:#333333;font-weight:700;text-align:center">
                         [+ 行を追加]を押して食費を登録してみましょう
                     </div>
-                    <div style="margin:auto;padding-top:10px"><v-img src="../../assets/empty_expenses.svg" maxWidth="180" maxHeight="180"/></div>
+                    <div style="margin:auto;padding-top:10px">
+                        <v-img src="../../assets/empty_expenses.svg" maxWidth="180" maxHeight="180"/>
+                    </div>
                 </div>
 
-                <div v-show="date === '' || isNaN(date)" style="height: 230px;display:flex;justify-content:space-around;margin:10px;flex-direction:column">
+                <div v-show="date === '' || isNaN(date)" class="register-guide">
                     <div style="font-size: 12px;line-height:20px;color:#333333;font-weight:700;text-align:center">
                         カレンダーをクリックするか、日付を直接入力して<br>食費を登録する日付を指定してください
                     </div>
-                    <div style="margin:auto;padding-top:10px"><v-img src="../../assets/empty_dates.svg" maxWidth="180" maxHeight="180"/></div>
+                    <div style="margin:auto;padding-top:10px">
+                        <v-img src="../../assets/empty_dates.svg" maxWidth="180" maxHeight="180"/>
+                    </div>
                 </div>
 
-            <div style="height:50px;display:flex;justify-content:center;align-items:center;margin:10px;justify-content:flex-between">
-            <v-btn @click="addItem" :disabled="targetDayReceipt.length === 4 || date === '' || isNaN(date)" color="#333333" width="100%" outlined><v-icon small>mdi-plus</v-icon>行を追加</v-btn>
+            <div class="add-row-button">
+                <v-btn @click="addReceipt" :disabled="targetDayReceipt.length === 4 || date === '' || isNaN(date)" color="#333333" width="100%" outlined>
+                    <v-icon small>mdi-plus</v-icon>
+                    行を追加
+                </v-btn>
             </div>
 
-            <div style="width:100%;height:1px;margin:20px 0;border-bottom:2px dashed #333333;"/>
+            <div class="divider"/>
 
-            <div style="height:50px;display:flex;justify-content:space-between;align-items:center;margin:10px;">
-                <div style="font-size:20px;font-weight:700;color:#333333">合計</div>
-                <div style="font-size:28px;font-weight:700;color:#333333">¥{{calcReceiptSummation()}}</div>
+            <div class="expense-summation">
+                <div class="expense-summation-label">合計</div>
+                <div class="expense-summation-value">¥{{calcReceiptSummation()}}</div>
             </div>
 
-            <div style="height:50px;display:flex;justify-content:space-around;align-items:center;margin:10px;">
+            <div class="register-button">
                 <v-btn :loading="loading" :disabled='targetDayReceipt.length === 0 || loading' @click="sendReceipt" width="100%" height="100%" color="#FF8A80" elevation="0" style="font-size:24px;font-weight:700;color:#FFF">
                     <v-icon style="margin-right:10px">mdi-checkbox-marked-circle-outline</v-icon>
                     登録
@@ -67,18 +74,13 @@
 </template>
 
 <script lang="ts">
-import _, { rest } from 'lodash';
+import _ from 'lodash';
 import { defineComponent, inject, computed, ref, watch, reactive, toRefs, toRef, onMounted } from '@vue/composition-api';
 import ExpensesKey from './expenses-key';
 import { ExpensesStore, Receipt } from '../../store/expenses';
-import { getByDate, post, update } from '../../apis/expensesApi';
-
-import { FoodStaffUnit } from '../../types/foodStaffTypes';
-import { Expenses, SnackbarState } from '../../types/expensesTypes';
-
 import * as ReceiptRest from '../../apis/receiptApi';
 import { GetReceipt, ReceiptSnackbarMessage, ReceiptSnackbarState, ValidationResult } from '../../types/receiptType';
-import Axios, { AxiosResponse } from 'axios';
+import { AxiosResponse } from 'axios';
 import { isUndefined } from 'util';
 
 export default defineComponent({
@@ -240,7 +242,7 @@ export default defineComponent({
             }
         }
 
-        const deleteItem = (id: number, index: number) => {
+        const deleteReceipt = (id: number, index: number) => {
             targetDayReceipt.splice(index, 1);
             if(isUndefined(id)) {
                 // idが見つからない = UI上で追加したitemの場合
@@ -260,7 +262,7 @@ export default defineComponent({
             });
         }
 
-        const addItem = () => {
+        const addReceipt = () => {
             if(targetDayReceipt.length < 4) {
                 let purchaseDate = new Date();
                 purchaseDate.setFullYear(purchaseDate.getFullYear(), receiptDate.month - 1, receiptDate.date);
@@ -302,8 +304,8 @@ export default defineComponent({
             sendReceipt,
             ...toRefs(snackbarState),
             targetDayReceipt,
-            deleteItem,
-            addItem,
+            deleteReceipt,
+            addReceipt,
             onMounted,
             calcReceiptSummation,
             changeStore,
@@ -317,7 +319,6 @@ export default defineComponent({
 
 <style scoped>
 @import url('https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@100;300;400;500;700;800;900&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=Gamja+Flower&display=swap');
 
 .v-text-field.input-date >>> input {
     color: #333333 !important;
@@ -327,7 +328,6 @@ export default defineComponent({
 }
 
 .v-text-field.input-expense >>> input {
-    /* font-family: 'Gamja Flower', cursive; */
     color: #333333 !important;
     font-weight: 700;
     font-size: 18px;
@@ -341,53 +341,91 @@ export default defineComponent({
     text-align: left;
 }
 
-.expenses_register {
+.expenses-register {
     font-family: 'M PLUS Rounded 1c', sans-serif;
     padding: 15px;
     height: 100%;
 }
-.date, .expenses {
-    height: 110px;
-    padding: 10px;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-evenly;
+
+.register-guide {
+    height: 230px;
+    display:flex;
+    justify-content:space-around;
+    margin:10px;
+    flex-direction:column;
 }
 
-.date-unit, .expenses-unit, .meal-unit {
-    margin:0 10px;
-    color:#616161;
+.receipt-register {
+    height:50px;
+    display:flex;
+    justify-content:space-around;
+    align-items:baseline;
+    margin:10px;
+}
+
+.register-label {
+    width:100%;
+    height:50px;
     font-weight:700;
-    text-align:center;
+    font-size:24px;
+    color:#F7D65A;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding-bottom:15px;
 }
 
-.meals{
-    height: 200px;
-    padding: 5px;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    align-items: left;
+.divider {
+    width:100%;
+    height:1px;
+    margin:20px 0;
+    border-bottom:2px dashed #333333;
 }
 
-.textfield-label {
-    margin-bottom: 5px;
-    font-weight: 700;
-    color: #9E9E9E;
-    font-size: 18px;
+.date-register {
+    width:100%;
+    height:50px;
+    display:flex;
+    align-items:end;
+    justify-content:center;
 }
-#register_expenses {
-    height: 100px;
-    text-align: center;
-    display: flex;
-    align-items: center;
-    margin: 10px;
+
+.add-row-button {
+    height:50px;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    margin:10px;
 }
-#register_button_label {
-    font-size: 24px;
-    font-weight: 700;
-    color: #FFFFFF;
+
+.expense-summation {
+    height:50px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin:10px;
 }
+
+.expense-summation-label {
+    font-size:20px;
+    font-weight:700;
+    color:#333333;
+}
+
+.expense-summation-value {
+    font-size:28px;
+    font-weight:700;
+    color:#333333;
+}
+
+.register-button {
+    height:50px;
+    display:flex;
+    justify-content:space-around;
+    align-items:center;
+    margin:10px;
+}
+
 .snackbar {
     font-family: 'M PLUS Rounded 1c', sans-serif;
 }

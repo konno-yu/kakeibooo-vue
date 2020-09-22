@@ -16,7 +16,7 @@ export type ValidationResult = {
     message: ReceiptSnackbarMessage
 };
 
-namespace messages {
+export namespace messages {
     export type RECEIPT_DELETED = '削除しました';
     export type RECEIPT_REGISTERED = '登録が完了しました';
     export type RECEIPT_UPDATED = '更新が完了しました';
