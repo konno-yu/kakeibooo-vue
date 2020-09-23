@@ -6,41 +6,47 @@
             </div>
 
             <div class="date-register">
-                <div style="width:30%"><v-text-field class="input-date" v-model="month" outlined dense disabled/></div>
-                <span style="font-size:28px;width:10%;text-align:center">/</span>
-                <div style="width:30%"><v-text-field @input="(newDate) => inputDate(newDate)" class="input-date" v-model="date" outlined dense/></div>
+                <div class="input-area">
+                    <v-text-field class="input-date" v-model="month" outlined dense disabled/>
+                </div>
+                <span class="slash">/</span>
+                <div class="input-area">
+                    <v-text-field class="input-date" @input="(newDate) => inputDate(newDate)" v-model="date" outlined dense/>
+                </div>
             </div>
 
             <div class="divider"/>
 
-            <div v-show="targetDayReceipt.length !== 0" style="height: 230px">
+            <div class="receipt-register" v-show="targetDayReceipt.length !== 0">
                 <!-- TODO v-modelと@changeの併用はよくないらしい -->
-                <div class="receipt-register" v-for="(item, i) in targetDayReceipt" :key="i">
-                    <v-text-field @change="(newStore) => changeStore(newStore, i)" v-model="item.store" color="#333333" class="input-shop" style="width:50%;margin-right:10px;padding:0 !important;" prepend-inner-icon="mdi-store" />
-                    <v-text-field @change="(newExpense) => changeExpense(newExpense, i)" v-model="item.expense" color="#333333" class="input-expense" style="width:30%;margin-left:10px;margin-right:10px;padding:0 !important" prepend-inner-icon="mdi-currency-jpy"/>
-                    <v-btn @click="deleteReceipt(item.id, i)" icon style="margin-left:10px"><v-icon>mdi-trash-can-outline</v-icon></v-btn>
+                <div class="receipt" v-for="(item, i) in targetDayReceipt" :key="i">
+                    <v-text-field class="input shop" @change="(newStore) => changeStore(newStore, i)" v-model="item.store" color="#333333" prepend-inner-icon="mdi-store" />
+                    <v-text-field class="input expense" @change="(newExpense) => changeExpense(newExpense, i)" v-model="item.expense" color="#333333" prepend-inner-icon="mdi-currency-jpy"/>
+                    <v-btn class="icon-delete" @click="deleteReceipt(item.id, i)" icon>
+                        <v-icon>mdi-trash-can-outline</v-icon>
+                    </v-btn>
                 </div>
             </div>
 
-                <div v-show="date !== '' && !isNaN(date) && targetDayReceipt.length === 0" class="register-guide">
-                    <div style="font-size: 14px;color:#333333;font-weight:700;text-align:center">
+                <div class="register-guide" v-show="date !== '' && !isNaN(date) && targetDayReceipt.length === 0">
+                    <div class="message empty">
                         [+ 行を追加]を押して食費を登録してみましょう
                     </div>
-                    <div style="margin:auto;padding-top:10px">
+                    <div class="guide-image">
                         <v-img src="../../assets/empty_expenses.svg" maxWidth="180" maxHeight="180"/>
                     </div>
                 </div>
 
-                <div v-show="date === '' || isNaN(date)" class="register-guide">
-                    <div style="font-size: 12px;line-height:20px;color:#333333;font-weight:700;text-align:center">
+                <div class="register-guide" v-show="date === '' || isNaN(date)">
+                    <div class="message no-input">
                         カレンダーをクリックするか、日付を直接入力して<br>食費を登録する日付を指定してください
                     </div>
-                    <div style="margin:auto;padding-top:10px">
+                    <div class="guide-image">
                         <v-img src="../../assets/empty_dates.svg" maxWidth="180" maxHeight="180"/>
                     </div>
                 </div>
 
-            <div class="add-row-button">
+            <div class="button-add-row">
                 <v-btn @click="addReceipt" :disabled="targetDayReceipt.length === 4 || date === '' || isNaN(date)" color="#333333" width="100%" outlined>
                     <v-icon small>mdi-plus</v-icon>
                     行を追加
@@ -50,24 +56,24 @@
             <div class="divider"/>
 
             <div class="expense-summation">
-                <div class="expense-summation-label">合計</div>
-                <div class="expense-summation-value">¥{{calcReceiptSummation()}}</div>
+                <div class="sum-label">合計</div>
+                <div class="sum-value">¥{{calcReceiptSummation()}}</div>
             </div>
 
-            <div class="register-button">
-                <v-btn :loading="loading" :disabled='targetDayReceipt.length === 0 || loading' @click="sendReceipt" width="100%" height="100%" color="#FF8A80" elevation="0" style="font-size:24px;font-weight:700;color:#FFF">
-                    <v-icon style="margin-right:10px">mdi-checkbox-marked-circle-outline</v-icon>
+            <div class="button-register-receipt">
+                <v-btn class="button-register" :loading="loading" :disabled='targetDayReceipt.length === 0 || loading' @click="sendReceipt" width="100%" height="100%" color="#FF8A80" elevation="0">
+                    <v-icon class="icon-check">mdi-checkbox-marked-circle-outline</v-icon>
                     登録
                 </v-btn>
             </div>
         </div>
 
         <!-- 登録成功時のsnackbar -->
-        <v-snackbar class="snackbar" v-model="isOpen" timeout="1500" right>
-            <div style="display:flex;align-items:center">
+        <v-snackbar v-model="isOpen" timeout="1500" right>
+            <div class="snackbar">
                 <v-icon v-show="mode === 'success'" color="#FFD600">mdi-piggy-bank</v-icon>
                 <v-icon v-show="mode === 'error'" color="#FF8A80">mdi-comment-alert-outline</v-icon>
-                <div style="color:#FFFFFF;font-weight:700;margin-left:5px">{{message}}</div>
+                <div class="message">{{message}}</div>
             </div>
         </v-snackbar>
     </v-app>
