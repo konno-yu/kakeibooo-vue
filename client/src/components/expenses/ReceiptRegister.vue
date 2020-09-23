@@ -317,116 +317,178 @@ export default defineComponent({
 });
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
 @import url('https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@100;300;400;500;700;800;900&display=swap');
-
-.v-text-field.input-date >>> input {
-    color: #333333 !important;
-    font-weight:700;
-    font-size: 18px;
-    text-align: center;
-}
-
-.v-text-field.input-expense >>> input {
-    color: #333333 !important;
-    font-weight: 700;
-    font-size: 18px;
-    text-align: left;
-}
-
-.v-text-field.input-shop >>> input {
-    color: #333333 !important;
-    font-weight: 700;
-    font-size: 16px;
-    text-align: left;
-}
-
 .expenses-register {
     font-family: 'M PLUS Rounded 1c', sans-serif;
     padding: 15px;
     height: 100%;
-}
 
-.register-guide {
-    height: 230px;
-    display:flex;
-    justify-content:space-around;
-    margin:10px;
-    flex-direction:column;
-}
+    .register-label {
+        width:100%;
+        height:50px;
+        font-weight:700;
+        font-size:24px;
+        color:#F7D65A;
+        display:flex;
+        align-items:center;
+        justify-content:center;
+        padding-bottom:15px;
+    }
 
-.receipt-register {
-    height:50px;
-    display:flex;
-    justify-content:space-around;
-    align-items:baseline;
-    margin:10px;
-}
+    .date-register {
+        width:100%;
+        height:50px;
+        display:flex;
+        align-items:end;
+        justify-content:center;
 
-.register-label {
-    width:100%;
-    height:50px;
-    font-weight:700;
-    font-size:24px;
-    color:#F7D65A;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    padding-bottom:15px;
-}
+        .input-area {
+            width: 30%;
+        }
 
-.divider {
-    width:100%;
-    height:1px;
-    margin:20px 0;
-    border-bottom:2px dashed #333333;
-}
+        .slash {
+            font-size:28px;
+            width:10%;
+            text-align:center;
+        }
 
-.date-register {
-    width:100%;
-    height:50px;
-    display:flex;
-    align-items:end;
-    justify-content:center;
-}
+        .input-date {
+            color: #333333 !important;
+            font-weight:700;
+            font-size: 18px;
+            text-align: center;
+        }
+    }
 
-.add-row-button {
-    height:50px;
-    display:flex;
-    justify-content:center;
-    align-items:center;
-    margin:10px;
-}
+    .divider {
+        width:100%;
+        height:1px;
+        margin:20px 0;
+        border-bottom:2px dashed #333333;
+    }
 
-.expense-summation {
-    height:50px;
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    margin:10px;
-}
+    .receipt-register {
+        height: 230px;
 
-.expense-summation-label {
-    font-size:20px;
-    font-weight:700;
-    color:#333333;
-}
+        .receipt {
+            height:50px;
+            display:flex;
+            justify-content:space-around;
+            align-items:baseline;
+            margin:10px;
+        }
 
-.expense-summation-value {
-    font-size:28px;
-    font-weight:700;
-    color:#333333;
-}
+        .input {
+            font-weight: 700;
+            font-size: 16px;
+            color: #333333 !important;
+            text-align: left;
+            padding:0 !important;
+        }
 
-.register-button {
-    height:50px;
-    display:flex;
-    justify-content:space-around;
-    align-items:center;
-    margin:10px;
+        .shop {
+            width:50%;
+            margin-right:10px;
+        }
+
+        .expense {
+            width:30%;
+            margin: 0 10px;
+            font-size: 18px;
+        }
+
+        .icon-delete {
+            margin-left: 10px;
+        }
+    }
+
+    .register-guide {
+        height: 230px;
+        display:flex;
+        justify-content:space-around;
+        margin:10px;
+        flex-direction:column;
+
+        .message {
+            color:#333333;
+            font-weight:700;
+            text-align:center;
+
+        }
+        .empty {
+            font-size: 14px;
+        }
+
+        .no-input {
+            font-size: 12px;
+            line-height:20px;
+        }
+
+        .guide-image {
+            margin:auto;
+            padding-top:10px;
+        }
+    }
+
+    .button-add-row {
+        height:50px;
+        display:flex;
+        justify-content:center;
+        align-items:center;
+        margin:10px;
+    }
+
+    .expense-summation {
+        height:50px;
+        display:flex;
+        justify-content:space-between;
+        align-items:center;
+        margin:10px;
+
+        .sum-label {
+            font-size:20px;
+            font-weight:700;
+            color:#333333;
+        }
+
+        .sum-value {
+            font-size:28px;
+            font-weight:700;
+            color:#333333;
+        }
+    }
+
+    .button-register-receipt {
+        height:50px;
+        display:flex;
+        justify-content:space-around;
+        align-items:center;
+        margin:10px;
+
+        .button-register {
+            font-size:24px;
+            font-weight:700;
+            color:#FFF;
+        }
+
+        .icon-check {
+            margin-right:10px;
+        }
+    }
 }
 
 .snackbar {
     font-family: 'M PLUS Rounded 1c', sans-serif;
+    display:flex;
+    align-items:center;
+
+    .message {
+        color:#FFFFFF;
+        font-weight:500;
+        margin-left:5px;
+        font-size:14px
+    }
 }
+
 </style>
