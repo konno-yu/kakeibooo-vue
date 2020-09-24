@@ -2,7 +2,7 @@ import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn } from "typeor
 
 
  @Entity('foodstaffs')
- export class Foodstaff {
+ export class Foodstaffs {
      @PrimaryGeneratedColumn('increment')
      id: number;
      @Column({type: 'varchar', length: 100, nullable: false, unique: true})

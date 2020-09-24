@@ -58,6 +58,6 @@ export class ExpensesService {
      */
     async update(id: number, data: Partial<ExpensesDto>) {
         await this.expensesRepository.update({ id }, data);
-        return this,this.expensesRepository.findOne({ where: { id: id } });
+        return this.expensesRepository.findOne({ where: { id: id } });
     }
 }

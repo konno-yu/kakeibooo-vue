@@ -5,7 +5,7 @@
             <div class="expenses-view-root">
                 <!-- 金額入力エリア -->
                 <div class="register-area">
-                    <ExpensesRegister/>
+                    <ReceiptRegister/>
                 </div>
                 <!-- カレンダーエリア -->
                 <div class="calendar-area">
@@ -19,13 +19,13 @@
 
 <script lang="ts">
 import { defineComponent, reactive, toRefs, onMounted } from '@vue/composition-api';
-import ExpensesRegister from '@/components/expenses/ExpensesRegister.vue';
+import ReceiptRegister from '@/components/expenses/ReceiptRegister.vue';
 import ExpensesCalendar from '@/components/expenses/ExpensesCalendar.vue';
 import ExpensesProvider from '@/components/expenses/ExpensesProvider.vue';
 
 export default defineComponent({
     components: {
-        ExpensesRegister,
+        ReceiptRegister,
         ExpensesCalendar,
         ExpensesProvider
     },
@@ -41,23 +41,23 @@ export default defineComponent({
     font-family: 'M PLUS Rounded 1c', sans-serif;
     width: 100%;
     height: 600px; /** 仮おき */
-    padding: 10px;
-    border-top: 2px solid #E0E0E0;
+    /* border-top: 2px solid #E0E0E0; */
     display: flex;
     flex-direction: row;
+    background: #F6F5F3;
 }
 .register-area {
-    width: 20%;
+    width: 500px;
     height: 600px; /** 仮おき */
-    padding: 10px;
-    border-right: 2px solid #E0E0E0;
-    margin-right: 10px;
+    /* margin: 10px; */
+    /* border-right: 2px solid #E0E0E0; */
+    /* margin-right: 10px; */
 }
 
 .calendar-area {
     width:100%;
     height: 600px;
-    padding: 10px;
+    /* padding: 10px; */
     display: flex;
     flex-direction: column;
     align-items: center;

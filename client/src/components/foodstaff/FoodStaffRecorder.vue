@@ -28,7 +28,7 @@
                 <div class="food_staff_list" style="overflow: scroll;">
                     <div class="small_category_tab">
                         <FoodStaffTab :tabItems="tabItems" v-model="selectedTab">
-                            <template slot-scope="{ tabItems, onTabChange, value }">
+                            <template slot-scope="{ tabItems, ontabchange, value }">
                             <FoodStaffTabItem
                                 v-for="(tabItem, index) in tabItems"
                                 :key="index"
@@ -92,7 +92,6 @@
                 </div>
             </div>
         </div>
-    </div>
 </template>
 
 <script lang="ts">
