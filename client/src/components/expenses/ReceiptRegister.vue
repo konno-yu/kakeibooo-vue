@@ -92,39 +92,45 @@ import { isUndefined } from 'util';
 export default defineComponent({
     setup() {
         const expensesStore = inject<ExpensesStore>(ExpensesKey);
-
         if(!expensesStore) {
             throw new Error(`${ExpensesKey} is not provided...`);
         }
 
+        // 買い物をした店舗と食費の集合
         const targetDayReceipt = reactive<Receipt[]>([]);
-
+        // 食費を登録する月と日
         const receiptDate = reactive<{month: number, date: number}>({
             month: new Date().getMonth() + 1,  // Date()の月は0始まりなので1足しておく
             date: new Date().getDate()
         });
-
+        // 登録時やエラー時に表示されるsnackbarの状態
         const snackbarState = reactive<ReceiptSnackbarState>({
             isOpen: false,
             mode: 'success',
             message: ''
         });
-
+        // 登録ボタンのローディング状態
         const loading = ref<boolean>(false);
 
-
-        // ライフサイクルメソッドの created() 相当
+        /**
+         * ライフサイクルメソッドの created() 相当
+         * アクセスした月の食費を全て取得し、画面表示用にアクセスした日の食費も別途取得する
+         */
         ReceiptRest.getByMonth(receiptDate.month).then((res: AxiosResponse<Receipt[]>) => {
             reflectDatabaseReceipts(res.data);
             setTargetDayReceipt(new Date().getDate());
         });
 
+        /**
+         * 月日の変更を監視し、変更があれば食費入力欄の表示を更新する
+         */
         watch(() => [expensesStore.month, expensesStore.date], (newStore) => {
             targetDayReceipt.splice(0, targetDayReceipt.length);
             if(receiptDate.month !== newStore[0]) {
-                // 月が変わった
+                // 月が変更された場合
                 [receiptDate.month, receiptDate.date] = newStore;
 
+                // 変更後の月の食費データを取り直す
                 ReceiptRest.getByMonth(receiptDate.month).then((res: AxiosResponse<Receipt[]>) => {
                     reflectDatabaseReceipts(res.data);
                     setTargetDayReceipt(receiptDate.date);
@@ -132,7 +138,7 @@ export default defineComponent({
                 return;
             }
             if(receiptDate.date !== newStore[1]) {
-                // 日が変わった
+                // 日が変更された場合
                 receiptDate.date = newStore[1];
                 setTargetDayReceipt(receiptDate.date);
             }
@@ -155,11 +161,15 @@ export default defineComponent({
             const target = expensesStore.receipts.filter(receipt => receipt.purchaseDate.getDate() === targetDate);
             target.forEach(t => targetDayReceipt.push(t));
         }
+
+        /**
+         * 入力された食費に不正な入力がないかを確認する
+         */
         const invalidInput = (): ValidationResult => {
             let result: ValidationResult = {isInvalid: true, message: '' };
-
             const thisYear = new Date().getFullYear();
             const endOf = new Date(thisYear, receiptDate.month, 0).getDate();
+
             targetDayReceipt.forEach(receipt => {
                 if(receiptDate.date < 1 || receiptDate.date >= endOf) {
                     result = { isInvalid: false, message: '無効な日付が指定されていませんか？' };
@@ -192,6 +202,10 @@ export default defineComponent({
             snackbarState.mode = mode;
             snackbarState.message = message;
         }
+
+        /**
+         * 入力された食費データをデータベースに登録する
+         */
         const sendReceipt = () => {
             const invalidResult = invalidInput();
             if(!invalidResult.isInvalid) {
@@ -203,7 +217,7 @@ export default defineComponent({
             const receipts: Receipt[] = expensesStore.receipts;
             const isPostAll = targetDayReceipt.filter(receipt => 'id' in receipt).length === 0;
             if(isPostAll) {
-                // ある日付に対して初めて食費を登録する
+                // ある日付に対して、初めて食費を登録する
                 ReceiptRest.postAll(targetDayReceipt).then((res: AxiosResponse<Receipt[]>) => {
                     if(res.data) {
                         targetDayReceipt.splice(0, targetDayReceipt.length);
@@ -218,6 +232,7 @@ export default defineComponent({
                     return;
                 });
             } else {
+                // 食費を登録済の日付に対して、食費を修正したり新規追加したりする
                 const restQueries: Promise<AxiosResponse<Receipt>>[] = [];
                 targetDayReceipt.forEach((receipt, i) => {
                     const isPut = 'id' in receipt;
@@ -229,9 +244,12 @@ export default defineComponent({
                         const newData: Receipt[] = [];
                         result.forEach(res => {
                             targetDayReceipt.push(res.data);
+                            // Promiseの結果に応じて振る舞いが変わる
                             if(res.config.method === "post") {
+                                // 食費を登録済の日付に新しく食費を登録した場合はstoreにそれらを追加する必要がある
                                 newData.push(res.data);
                             } else {
+                                // 登録済の食費情報を書き換えた場合には、既にstoreにある情報を上書きするだけでよい
                                 receipts.forEach(r => {
                                     if(r.id === res.data.id) {
                                         r.store = res.data.store;
@@ -251,10 +269,13 @@ export default defineComponent({
             }
         }
 
+        /**
+         * 登録された食費データを削除する
+         */
         const deleteReceipt = (id: number, index: number) => {
             targetDayReceipt.splice(index, 1);
             if(isUndefined(id)) {
-                // idが見つからない = UI上で追加したitemの場合
+                // idが見つからない ＝ UI上で入力欄を追加しただけなのでRESTは発行せずクライアント側で要素を消すだけでよい
                 return;
             }
             ReceiptRest.deleteById(id).then((res) => {
@@ -269,6 +290,9 @@ export default defineComponent({
             });
         }
 
+        /**
+         * 食費データの入力欄を増やす
+         */
         const addReceipt = () => {
             if(targetDayReceipt.length < 4) {
                 let purchaseDate = new Date();
@@ -278,22 +302,34 @@ export default defineComponent({
             }
         }
 
+        /**
+         * 合計値をカンマ区切りで表示する
+         */
         const calcReceiptSummation = () => {
             return targetDayReceipt.reduce((sum, receipt) => Number(sum) + Number(receipt.expense), 0).toLocaleString();
         }
 
+        /**
+         * 「店舗」入力欄の変更を反映する
+         */
         const changeStore = (newStore: string, i: number) => {
             const updatedTarget = targetDayReceipt[i];
             updatedTarget.store = newStore;
             targetDayReceipt.splice(i, 1, updatedTarget);
         }
 
+        /**
+         * 「食費」入力欄の変更を反映する
+         */
         const changeExpense = (newExpense: number, i: number) => {
             const updateTarget = targetDayReceipt[i];
             updateTarget.expense = Number(newExpense);
             targetDayReceipt.splice(i, 1, updateTarget);
         }
 
+        /**
+         * 「日付」入力欄の変更を反映する
+         */
         const inputDate = (newDate: number) => {
             targetDayReceipt.splice(0, targetDayReceipt.length);
             expensesStore.receipts.forEach(receipt => {
