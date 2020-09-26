@@ -171,7 +171,7 @@ export default defineComponent({
             const endOf = new Date(thisYear, receiptDate.month, 0).getDate();
 
             targetDayReceipt.forEach(receipt => {
-                if(receiptDate.date < 1 || receiptDate.date >= endOf) {
+                if(receiptDate.date < 1 || receiptDate.date > endOf) {
                     result = { isInvalid: false, message: '無効な日付が指定されていませんか？' };
                     return;
                 }
