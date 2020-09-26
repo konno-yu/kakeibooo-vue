@@ -13,13 +13,6 @@ CREATE TABLE foodstaffs (
     sub_category VARCHAR(20)
 );
 
--- 食費テーブル
-CREATE TABLE expenses (
-    id SERIAL NOT NULL,
-    target_date DATE NOT NULL,
-    cost INTEGER NOT NULL
-);
-
 -- レシート単位の食費テーブル
 CREATE TABLE receipts (
     id SERIAL NOT NULL,
