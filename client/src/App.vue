@@ -7,7 +7,7 @@
 
 <script lang="ts">
 import { defineComponent } from '@vue/composition-api';
-import KakeiboooAppbar from '@/components/appbar/KakeiboooAppbar.vue';
+import KakeiboooAppbar from '@/components/appbar/KakeiboooAppBar.vue';
 
 export default defineComponent({
   components: {
