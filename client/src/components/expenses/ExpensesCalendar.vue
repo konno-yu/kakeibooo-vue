@@ -44,7 +44,6 @@
 <script lang="ts">
 import { defineComponent, reactive, onMounted, toRefs, inject, computed, watch } from '@vue/composition-api';
 import moment from 'moment';
-import { getByMonth } from '../../apis/expensesApi';
 import * as ReceiptApi from '../../apis/receiptApi';
 import ExpensesKey from './expenses-key';
 import { ExpensesStore } from '../../store/expenses';
@@ -73,20 +72,12 @@ export default defineComponent({
         const displayPrevMonth = () => {
             const prevMonth  = (month.value - 1) > 0 ? month.value - 1 : 12;
             expensesStore.setMonth(prevMonth);
-            // expensesStore.setDate(1);
-            // expensesStore.setDayExpenses(0);
             ReceiptApi.getByMonth(month.value).then(() => buildCalendarBody());
-            // buildCalendarBody();
-            // getByMonth(month.value).then((response) => buildCalendarBody(response.data as Expenses[]));
         };
         const displayNextMonth = () => {
             const nextMonth = (month.value + 1) > 12 ? 1 : month.value + 1;
             expensesStore.setMonth(nextMonth);
-            // expensesStore.setDate(1);
-            // expensesStore.setDayExpenses(0);
             ReceiptApi.getByMonth(month.value).then(() => buildCalendarBody());
-            // buildCalendarBody();
-            // getByMonth(month.value).then((resbuildCalendarBody();ponse) => buildCalendarBody(response.data as Expenses[]));
         }
 
         const buildCalendarBody = (data?: Expenses[]) => {
@@ -109,23 +100,6 @@ export default defineComponent({
                     weekIndex++;
                 }
             });
-            // const targetMonth = moment().month(expensesStore.month - 1);
-            // const endOf = targetMonth.endOf("month").date();
-            // let weekIndex = 0;
-
-            // const updatedMonthlyExpenses = [...Array(6)].map(week => Array(7).fill({date: null, cost: null}));
-
-            // [...Array(endOf).keys()].map((_, i) => i + 1).forEach((date) => {
-            //     // 探す日をdateとして、対応するデータがあるか探す
-            //     const correspondingData = data.find(d => moment(d.targetDate).date() === date);
-            //     const targetDay = correspondingData
-            //     ? moment(correspondingData.targetDate).day()
-            //     : moment(moment().year(2020).month(expensesStore.month - 1).date(date)).day();
-            //     updatedMonthlyExpenses[weekIndex].splice(targetDay, 1, {date: date, cost: correspondingData ? correspondingData.cost : null});
-            //     if(targetDay === 6) {
-            //         weekIndex++;
-            //     }
-            // });
             expensesStore.setMonthlyExpenses(monthlyExpenses);
         }
 
@@ -139,15 +113,6 @@ export default defineComponent({
                 expensesStore.setDayExpenses(0);
             }
         }
-
-        // onMounted(() => {
-        //     console.log("cal");
-        //     buildCalendarBody();
-        // //     ReceiptApi.getAll().then(res => )
-        //     // getByMonth(expensesStore.month).then((response) => {
-        //     //     buildCalendarBody(response.data as Expenses[]);
-        //     // });
-        // });
 
         return {
             month,

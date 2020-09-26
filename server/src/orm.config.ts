@@ -1,7 +1,6 @@
 import { TypeOrmModuleOptions } from '@nestjs/typeorm';
 import { SnakeNamingStrategy } from 'typeorm-naming-strategies';
 import { Foodstaffs } from './foodstaffs/foodstaffs.entity';
-import { Expenses } from './expenses/expenses.entity';
 import { Receipts } from './receipts/receipts.entity';
 
 export const config: TypeOrmModuleOptions = {
@@ -12,7 +11,7 @@ export const config: TypeOrmModuleOptions = {
     host: 'localhost',
     database: 'kakeibooo',
     synchronize: false,
-    entities: [Foodstaffs, Expenses, Receipts],
+    entities: [Foodstaffs, Receipts],
     logging: true,
     namingStrategy: new SnakeNamingStrategy()
 };
