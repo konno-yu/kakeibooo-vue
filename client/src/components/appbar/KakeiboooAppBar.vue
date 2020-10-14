@@ -7,7 +7,7 @@
             </div>
             <div class="tab-area">
                 <kakeiboooTab :tabItems="tabItems" v-model="selectedTab">
-                    <template slot-scope="{ tabItems, ontabchange, value }">
+                    <template slot-scope="{ tabItems, value }">
                         <kakeiboooTabItem
                           v-for="(tabItem, index) in tabItems"
                           :key="index"
@@ -29,7 +29,7 @@
         </div>
         <div>
             <ExpensesView v-show="selectedTab === '家計簿'"/>
-            <!-- <ExpensesView v-show="selectedTab === '食費管理'"/> -->
+            <AnalysisView v-show="selectedTab === '食費'"/>
             <FoodStaffView v-show="selectedTab === '食材'"/>
         </div>
     </v-app>
@@ -42,6 +42,7 @@ import KakeiboooTabItem from '@/components/common/KakeiboooTabItem.vue';
 import { AppbarTabCategory } from '../../types/commonTypes';
 import FoodStaffView from '@/views/FoodStaffView.vue';
 import ExpensesView from '@/views/ExpensesView.vue';
+import AnalysisView from '@/views/AnalysisView.vue';
 
 type HeaderType = {
     appTitle: string,
@@ -57,7 +58,8 @@ export default defineComponent({
         KakeiboooTab,
         KakeiboooTabItem,
         ExpensesView,
-        FoodStaffView
+        FoodStaffView,
+        AnalysisView
     },
 
     setup() {
